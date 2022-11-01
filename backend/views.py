@@ -1,14 +1,13 @@
-from django.contrib import messages
 from django.http import Http404
 from venv import create
 from django.shortcuts import render
 from rest_framework import generics, status, viewsets
-from .getters import getPlayers
 from .serializers import PlayerSerializer
 from .models import Player
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from .updates import savePlayers
 
 from backend import serializers
 
@@ -20,16 +19,9 @@ class PlayerView(generics.ListAPIView):
 
 class ListPlayersView(APIView):
     serializer_class = PlayerSerializer
-    queryset = getPlayers()
-    for player in queryset:
-        name = player['web_name']
-        goals = player['goals_scored']
-        assists = player['assists']
-        team_code = player['team_code']
-        points = player['total_points']
-        p = Player(web_name = name, goals_scored = goals, assists = assists, team_code = team_code, total_points = points)
-        p.save()
-
+    queryset = Player.objects.all()
+    savePlayers()
+    
     def get(self, request, format=None):
         players = Player.objects.all()
         serializer = PlayerSerializer(players, many=True)
