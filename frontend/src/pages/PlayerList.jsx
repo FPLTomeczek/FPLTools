@@ -1,13 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import axios from 'axios'
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import TableSortLabel from '@mui/material/TableSortLabel';
-import Paper from '@mui/material/Paper';
+import ClubLogos from '../components/ClubLogos'
+import './../css/PlayerList.css'
 
 function PlayerList() {
 
@@ -19,8 +13,16 @@ function PlayerList() {
 const [data, setData] = useState(null)
 const [loading, setLoading] = useState(true)
 const [error, setError] = useState(null)
-const [order, setOrder] = useState('asc')
-const header = ['Name', 'Goals', 'Assists', 'Points', 'Team']
+const [sortField, setSortField] = useState("")
+const [order, setOrder] = useState("asc")
+
+const columns = [
+  { label: "Name", accessor: "web_name" },
+  { label: "Goals", accessor: "goals_scored" },
+  { label: "Assists", accessor: "assists" },
+  { label: "Points", accessor: "total_points" },
+  { label: "Team", accessor: "team_code" },
+ ];
 
 // useEffect(() => {
 //     fetch(`https://api.github.com/users/eunit99/repos`)
@@ -54,49 +56,61 @@ useEffect(() => {
     getData();
   }, [loading]);
 
-  // const handleSort = (event) =>{
-  //   if(order === 'asc'){
-  //     setOrder('desc')
-  //   }
-  //   else if(order === 'desc'){
-  //     setOrder('asc')
-  //   }
-  // }
+  const handleSorting = (sortField, sortOrder) => {
+    if (sortField) {
+      const sorted = [...data].sort((a, b) => {
+       return (
+        a[sortField].toString().localeCompare(b[sortField].toString(), "en", {
+         numeric: true,
+        }) * (sortOrder === "asc" ? 1 : -1)
+       );
+      });
+      setData(sorted);
+     }
+    console.log(sortField, sortOrder)
+   };
+
+  const handleSortingChange = (accessor) => {
+    const sortOrder =
+      accessor === sortField && order === "asc" ? "desc" : "asc";
+    setSortField(accessor);
+    setOrder(sortOrder);
+    handleSorting(accessor, sortOrder);
+   };
 
   return (
     <div className='PlayerList'>
+      <ClubLogos/>
         {loading && <p>Loading...</p>}
         {!loading && <p>Fetched data</p>}
-        <div>
-          <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell align="right" sortDirection={order}>Goals
-                  </TableCell>
-                  <TableCell align="right">Assists</TableCell>
-                  <TableCell align="right">Points</TableCell>
-                  <TableCell align="right">Team</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {data && data.map((player, index) => (
-                  <TableRow
-                    key={index}
-                  >
-                    <TableCell>{player.web_name}</TableCell>
-                    <TableCell align="right">{player.goals_scored}</TableCell>
-                    <TableCell align="right">{player.assists}</TableCell>
-                    <TableCell align="right">{player.total_points}</TableCell>
-                    <TableCell align="right">{player.team_code}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </div>
+        <div className='PlayerListTable'>
+      <table>
+        <thead>
+        <tr>
+          {columns.map(({label, accessor}) =>{
+            return(
+              <th key={accessor} onClick={() => handleSortingChange(accessor)}>{label}</th>
+            )
+          })}
+        </tr>
+        </thead>
+        <tbody>
+        {data && data.map((val) =>{
+          return(
+            <tr key={val.id}>
+              {columns.map(({accessor}) =>{
+                //if (accessor === 'team_code' && val[accessor] === 8)
+                const tData = val[accessor] ? val[accessor] : '0';
+                return <td key={accessor}>{tData}</td>
+              })}
+            </tr>
+          )
+        })}
+        </tbody>
+      </table>
+      </div>
     </div>
+
   )
 }
 
