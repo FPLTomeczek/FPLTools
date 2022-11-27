@@ -1,9 +1,9 @@
-import './App.css';
-import PlayerList from './pages/PlayerList';
+import "./App.css";
+import Stats from "./Stats";
 function App() {
   return (
     <div className="App">
-      <PlayerList/>
+      <Stats />
     </div>
   );
 }
