@@ -11,7 +11,7 @@ class Player(models.Model):
     web_name = models.CharField(max_length = 40)
     goals_scored = models.IntegerField()
     assists = models.IntegerField()
-    team_code = models.IntegerField()
+    team_code = models.CharField(max_length=30)
     total_points = models.IntegerField()
 
 class UserFplPicks(models.Model):
