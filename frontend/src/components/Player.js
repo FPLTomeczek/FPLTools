@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { RiTShirt2Line } from "react-icons/ri";
 import { useEffect } from "react";
 import axios from "axios";
-import "./css/TFPlayer.css";
 
 function Player({ id, pos, cpt, vcpt }) {
   // get player by ID

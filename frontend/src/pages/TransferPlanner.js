@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Player from "./Player";
-import "./css/TF.css";
+import Player from "../components/Player";
+import "../css/TF.css";
+import PlayerList from "../components/PlayerList";
+import FilterByTeam from "../components/FilterByTeam";
 
 function TransferPlanner({ id }) {
   const [team, setTeam] = useState({});
+  const [selected, setSelected] = useState("");
   const [players, setPlayers] = useState([
     {
       id: null,
@@ -228,6 +231,8 @@ function TransferPlanner({ id }) {
           <Player key={i} {...player} />
         ))}
       </div>
+      <FilterByTeam selected={selected} setSelected={setSelected} />
+      <PlayerList teamCode={selected} />
     </>
   );
 }

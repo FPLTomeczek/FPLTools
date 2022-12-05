@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./css/PlayerList.css";
+import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 
 function PlayerList({ teamCode }) {
   // basic fetch
@@ -13,6 +13,7 @@ function PlayerList({ teamCode }) {
   const [error, setError] = useState(null);
   const [sortField, setSortField] = useState("");
   const [order, setOrder] = useState("asc");
+  const [filterStr, setFilterStr] = useState("");
 
   const columns = [
     { label: "Name", accessor: "web_name" },
@@ -50,7 +51,6 @@ function PlayerList({ teamCode }) {
       });
       setData(sorted);
     }
-    console.log(sortField, sortOrder);
   };
 
   const handleSortingChange = (accessor) => {
@@ -61,12 +61,13 @@ function PlayerList({ teamCode }) {
     handleSorting(accessor, sortOrder);
   };
 
-  //  const filterData = data.filter(player => {
-  //   return (player.team_code === 8)
-  //  })
-
   return (
     <div className="PlayerList">
+      <input
+        type="text"
+        value={filterStr}
+        onChange={(e) => setFilterStr(e.target.value)}
+      ></input>
       <div className="PlayerListTable">
         <table>
           <thead>
@@ -77,7 +78,14 @@ function PlayerList({ teamCode }) {
                     key={accessor}
                     onClick={() => handleSortingChange(accessor)}
                   >
-                    {label}
+                    <div className="th-container">
+                      <p>{label}</p>
+                      {order === "asc" && sortField === accessor.toString() ? (
+                        <AiOutlineArrowUp className="arrow" />
+                      ) : (
+                        <AiOutlineArrowDown className="arrow" />
+                      )}
+                    </div>
                   </th>
                 );
               })}
@@ -86,9 +94,31 @@ function PlayerList({ teamCode }) {
           {teamCode ? (
             <tbody>
               {data &&
+                !filterStr &&
                 data
                   .filter((player) => {
                     return player.team_code === teamCode;
+                  })
+                  .map((val) => {
+                    return (
+                      <tr key={val.id}>
+                        {columns.map(({ accessor }) => {
+                          const tData = val[accessor] ? val[accessor] : "0";
+                          return <td key={accessor}>{tData}</td>;
+                        })}
+                      </tr>
+                    );
+                  })}
+              {data &&
+                filterStr &&
+                data
+                  .filter((player) => {
+                    return (
+                      player.team_code === teamCode &&
+                      player.web_name
+                        .toLowerCase()
+                        .includes(filterStr.toLowerCase())
+                    );
                   })
                   .map((val) => {
                     return (
@@ -104,6 +134,7 @@ function PlayerList({ teamCode }) {
           ) : (
             <tbody>
               {data &&
+                !filterStr &&
                 data.map((val) => {
                   return (
                     <tr key={val.id}>
@@ -114,6 +145,24 @@ function PlayerList({ teamCode }) {
                     </tr>
                   );
                 })}
+              {data &&
+                filterStr &&
+                data
+                  .filter((player) =>
+                    player.web_name
+                      .toLowerCase()
+                      .includes(filterStr.toLowerCase())
+                  )
+                  .map((val) => {
+                    return (
+                      <tr key={val.id}>
+                        {columns.map(({ accessor }) => {
+                          const tData = val[accessor] ? val[accessor] : "0";
+                          return <td key={accessor}>{tData}</td>;
+                        })}
+                      </tr>
+                    );
+                  })}
             </tbody>
           )}
         </table>

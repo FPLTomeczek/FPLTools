@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import data from "./clubImages";
-import PlayerList from "./PlayerList";
-import ClubLogos from "./ClubLogos";
-import ".//css/Stats.css";
+import data from "../clubImages";
+import PlayerList from "../components/PlayerList";
+import ClubLogos from "../components/ClubLogos";
+import "../css/Stats.css";
+import FilterByTeam from "../components/FilterByTeam";
 
 function Stats() {
   const [teamCode, setTeamCode] = useState("");

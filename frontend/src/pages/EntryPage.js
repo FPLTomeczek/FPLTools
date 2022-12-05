@@ -2,12 +2,11 @@ import axios from "axios";
 import React from "react";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import "./css/EntryPage.css";
+import "../css/EntryPage.css";
 
 var qs = require("qs");
 
 function EntryPage({ id, setId }) {
-  const [team, setTeam] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState("");
 

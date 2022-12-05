@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "./css/ClubLogos.css";
 
 function ClubLogos({ clubImages, setTeamCode }) {
   return (

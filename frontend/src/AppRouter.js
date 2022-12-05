@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import Stats from "./Stats";
-import Injuries from "./Injuries";
-import EntryPage from "./EntryPage";
-import TransferPlanner from "./TransferPlanner";
-import Navbar from "./Navbar";
+import Stats from "./pages/Stats";
+import Injuries from "./pages/Injuries";
+import EntryPage from "./pages/EntryPage";
+import TransferPlanner from "./pages/TransferPlanner";
+import Navbar from "./components/Navbar";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function AppRouter() {
