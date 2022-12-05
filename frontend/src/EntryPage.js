@@ -2,6 +2,7 @@ import axios from "axios";
 import React from "react";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import "./css/EntryPage.css";
 
 var qs = require("qs");
 
@@ -34,7 +35,7 @@ function EntryPage({ id, setId }) {
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="form-container">
         <label htmlFor="id">ID: </label>
         <input
           id="id"
@@ -43,7 +44,9 @@ function EntryPage({ id, setId }) {
           value={id}
           placeholder="Put your team ID here"
         ></input>
-        <button type="submit">Submit</button>
+        <button className="btn" type="submit">
+          Submit
+        </button>
       </form>
     </>
   );
