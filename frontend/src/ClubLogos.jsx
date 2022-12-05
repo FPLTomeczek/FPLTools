@@ -7,7 +7,6 @@ function ClubLogos({ clubImages, setTeamCode }) {
       {clubImages &&
         clubImages.map((image) => {
           const { img, teamCode } = image;
-          console.log(img, teamCode);
           return (
             <img
               src={img}

@@ -1,11 +1,8 @@
 import "./App.css";
-import Stats from "./Stats";
+import AppRouter from "./AppRouter";
+
 function App() {
-  return (
-    <div className="App">
-      <Stats />
-    </div>
-  );
+  return <AppRouter />;
 }
 
 export default App;

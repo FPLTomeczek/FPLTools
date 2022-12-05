@@ -1,0 +1,9 @@
+.player {
+  border: 1px solid red;
+  text-align: center;
+}
+
+.player #shirt {
+  width: 100px;
+  height: auto;
+}

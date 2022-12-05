@@ -22,65 +22,6 @@ function PlayerList({ teamCode }) {
     { label: "Team", accessor: "team_code" },
   ];
 
-  // const printTeam = (val) => {
-  //   switch (val) {
-  //     case 1:
-  //       return "Man United";
-  //     case 3:
-  //       return "Arsenal";
-  //     case 7:
-  //       return "Aston Villa";
-  //     case 8:
-  //       return "Chelsea";
-  //     case 91:
-  //       return "Bournemouth";
-  //     case 94:
-  //       return "Brentford";
-  //     case 36:
-  //       return "Brighton";
-  //     case 31:
-  //       return "Crystal Palace";
-  //     case 11:
-  //       return "Everton";
-  //     case 54:
-  //       return "Fulham";
-  //     case 2:
-  //       return "Leeds";
-  //     case 13:
-  //       return "Leicester";
-  //     case 14:
-  //       return "Liverpool";
-  //     case 43:
-  //       return "Man City";
-  //     case 4:
-  //       return "Newcastle";
-  //     case 17:
-  //       return "Nottingham Forest";
-  //     case 20:
-  //       return "Southampton";
-  //     case 6:
-  //       return "Spurs";
-  //     case 21:
-  //       return "West Ham";
-  //     case 39:
-  //       return "Wolverhampton";
-  //     default:
-  //       console.log("default case");
-  //   }
-  // };
-  // useEffect(() => {
-  //     fetch(`https://api.github.com/users/eunit99/repos`)
-  //         .then(response => response.json())
-  //         .then((usefulData) => {
-  //             console.log(usefulData);
-  //             setLoading(false);
-  //             setData(usefulData)
-  //         })
-  //         .catch((e) => {
-  //             console.error('An error occurred: ' + e)
-  //         })
-  // },[])
-
   useEffect(() => {
     const getData = async () => {
       try {

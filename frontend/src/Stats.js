@@ -8,10 +8,7 @@ function Stats() {
   const [clubImages, setClubImages] = useState(data);
   const handleSettingTeamCode = (team_code) => {
     setTeamCode(team_code);
-    console.log(teamCode);
   };
-
-  console.log("Stats:", clubImages);
 
   return (
     <div>
