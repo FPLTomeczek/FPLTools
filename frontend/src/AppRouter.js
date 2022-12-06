@@ -14,7 +14,7 @@ function AppRouter() {
       <Routes>
         <Route path="/" element={<EntryPage id={id} setId={setId} />} />
         <Route path="/stats" element={<Stats />} />
-        <Route path="/tf" element={<TransferPlanner id={id} />} />
+        <Route path="/tf" element={<TransferPlanner team_id={id} />} />
         <Route path="/injuries" element={<Injuries />} />
       </Routes>
     </BrowserRouter>

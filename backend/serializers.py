@@ -5,7 +5,7 @@ from .models import Player, UserFplPicks
 class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
-        fields = ('id', 'web_name', 'goals_scored', 'assists', 'team_code', 'total_points')
+        fields = ('id', 'web_name', 'goals_scored', 'assists', 'team_code', 'total_points', 'position', 'price')
 
 class UserFplPicksSerializer(serializers.ModelSerializer):
     class Meta:

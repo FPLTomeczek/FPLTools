@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.core.validators import MinValueValidator, MaxValueValidator
 # Create your models here.
 # class UserTeam(models.Model):
 #     element = models.IntegerField(max=10000)
@@ -13,8 +13,12 @@ class Player(models.Model):
     assists = models.IntegerField()
     team_code = models.CharField(max_length=30)
     total_points = models.IntegerField()
+    position = models.IntegerField(null=True, validators=[MinValueValidator(1), MaxValueValidator(4)])
+    price = models.IntegerField(null=True, validators=[MaxValueValidator(200)])
 
 class UserFplPicks(models.Model):
+    team_value = models.IntegerField(default=0)
+    bank_value = models.IntegerField(default=0)
     p1 = models.ForeignKey(Player, null=True, on_delete=models.SET_NULL, related_name='pick1')
     p1_pos = models.IntegerField()
     p1_cpt = models.BooleanField()

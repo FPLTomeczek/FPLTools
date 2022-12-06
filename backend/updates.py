@@ -1,4 +1,4 @@
-from .getters import getPlayers, getFPLTeamByID
+from .getters import getPlayers, getFPLTeamByID, getTeamBankValue
 from .models import Player, UserFplPicks
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -39,11 +39,14 @@ def savePlayers():
             assists = player['assists']
             team_code = setTeamCode(player['team_code'])
             points = player['total_points']
-            p = Player(id=id, web_name = name, goals_scored = goals, assists = assists, team_code = team_code, total_points = points)
+            position = player['element_type']
+            price = player['now_cost']
+            p = Player(id=id, web_name = name, goals_scored = goals, assists = assists, team_code = team_code, total_points = points, position = position, price = price)
             p.save()
 
 def saveUserFPLPicks(id):
         queryset = getFPLTeamByID(id, 16)
+        team_value, bank_value = getTeamBankValue(id, 16)
         try:
             user_picks = UserFplPicks.objects.get(id = id)
         except ObjectDoesNotExist:
@@ -107,7 +110,7 @@ def saveUserFPLPicks(id):
             p15_pos = queryset[14]['position']
             p15_cpt = queryset[14]['is_captain']
             p15_vcpt = queryset[14]['is_vice_captain']
-            user_picks = UserFplPicks(id = id,
+            user_picks = UserFplPicks(id = id, team_value = team_value, bank_value = bank_value,
             p1 = p1, p1_pos = p1_pos, p1_cpt = p1_cpt, p1_vcpt = p1_vcpt,
             p2 = p2, p2_pos = p2_pos, p2_cpt = p2_cpt, p2_vcpt = p2_vcpt,
             p3 = p3, p3_pos = p3_pos, p3_cpt = p3_cpt, p3_vcpt = p3_vcpt,

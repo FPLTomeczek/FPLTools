@@ -5,9 +5,11 @@ import "../css/TF.css";
 import PlayerList from "../components/PlayerList";
 import FilterByTeam from "../components/FilterByTeam";
 
-function TransferPlanner({ id }) {
+function TransferPlanner({ team_id }) {
   const [team, setTeam] = useState({});
   const [selected, setSelected] = useState("");
+  const [teamValue, setTeamValue] = useState(0);
+  const [bankValue, setBankValue] = useState(0);
   const [players, setPlayers] = useState([
     {
       id: null,
@@ -109,9 +111,11 @@ function TransferPlanner({ id }) {
       try {
         setIsLoading(true);
         const response = await axios.get(
-          `http://localhost:8000/api/user-picks/${id}`
+          `http://localhost:8000/api/user-picks/${team_id}`
         );
         const resp = response.data;
+        setTeamValue(resp["team_value"]);
+        setBankValue(resp["bank_value"]);
         setTeam({ ...response.data });
         const players = [
           {
@@ -209,6 +213,8 @@ function TransferPlanner({ id }) {
         setIsError(false);
         console.log("team");
         console.log(team);
+        console.log("players");
+        console.log(players);
       } catch (err) {
         console.log("error");
         console.log(err.message);
@@ -219,18 +225,22 @@ function TransferPlanner({ id }) {
       }
     };
     getData();
-  }, [id]);
+  }, []);
 
   return (
     <>
       <h4>{isLoading ? "...Fetching" : "Loaded"}</h4>
       <h2>TransferPlanner</h2>
-      <h2>{id}</h2>
-      <div className="planner">
-        {players.map((player, i) => (
-          <Player key={i} {...player} />
-        ))}
-      </div>
+      <h2>{team_id}</h2>
+      <h4>{teamValue}</h4>
+      <h4>{bankValue}</h4>
+      {players.filter((player) => player.id !== null).length > 0 && (
+        <div className="planner">
+          {players.map((player, i) => (
+            <Player key={i} {...player} />
+          ))}
+        </div>
+      )}
       <FilterByTeam selected={selected} setSelected={setSelected} />
       <PlayerList teamCode={selected} />
     </>

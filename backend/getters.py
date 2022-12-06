@@ -20,3 +20,15 @@ def getFPLTeamByID(id, curr_week):
         my_team_data = requests.get(url).json() 
         my_team_data = my_team_data['picks']
         return my_team_data   
+
+def getTeamBankValue(id, curr_week):
+    team_id = id
+    current_week = curr_week
+    url = "https://fantasy.premierleague.com/api/entry/"+str(team_id)+"/event/"+str(current_week)+"/picks/"
+    my_team_data = requests.get(url).json()
+    my_team_data = my_team_data['entry_history']
+    value = my_team_data['value']
+    bank = my_team_data['bank']
+    return value, bank
+
+getTeamBankValue(7770, 16)
