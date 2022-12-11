@@ -10,6 +10,7 @@ function TransferPlanner({ team_id }) {
   const [selected, setSelected] = useState("");
   const [teamValue, setTeamValue] = useState(0);
   const [bankValue, setBankValue] = useState(0);
+  const [blankPlayerKey, setBlankPlayerKey] = useState(null);
   const [players, setPlayers] = useState([
     {
       id: null,
@@ -211,13 +212,7 @@ function TransferPlanner({ team_id }) {
         ];
         setPlayers(players);
         setIsError(false);
-        console.log("team");
-        console.log(team);
-        console.log("players");
-        console.log(players);
       } catch (err) {
-        console.log("error");
-        console.log(err.message);
         setIsError(true);
         setTeam(null);
       } finally {
@@ -226,6 +221,20 @@ function TransferPlanner({ team_id }) {
     };
     getData();
   }, []);
+
+  const removePlayer = (playerId) => {
+    const newPlayers = [...players];
+    newPlayers[playerId] = { id: null, cpt: false, vcpt: false };
+    setPlayers(newPlayers);
+    setBlankPlayerKey(playerId);
+  };
+
+  const addPlayer = (playerId) => {
+    const newPlayers = [...players];
+    newPlayers[blankPlayerKey] = { id: playerId };
+    setPlayers(newPlayers);
+    setBlankPlayerKey(null);
+  };
 
   return (
     <>
@@ -237,12 +246,17 @@ function TransferPlanner({ team_id }) {
       {players.filter((player) => player.id !== null).length > 0 && (
         <div className="planner">
           {players.map((player, i) => (
-            <Player key={i} {...player} />
+            <Player
+              key={i}
+              {...player}
+              playerkey={i}
+              removePlayer={removePlayer}
+            />
           ))}
         </div>
       )}
       <FilterByTeam selected={selected} setSelected={setSelected} />
-      <PlayerList teamCode={selected} />
+      <PlayerList teamCode={selected} addPlayer={addPlayer} />
     </>
   );
 }

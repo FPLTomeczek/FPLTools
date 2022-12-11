@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 
-function PlayerList({ teamCode }) {
+function PlayerList({ teamCode, addPlayer }) {
   // basic fetch
 
   // fetch('https://api.github.com/users/eunit99/repos')
@@ -23,13 +23,16 @@ function PlayerList({ teamCode }) {
     { label: "Team", accessor: "team_code" },
   ];
 
+  const handleAddingPlayer = (playerId) => {
+    addPlayer(playerId);
+  };
+
   useEffect(() => {
     const getData = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/api/players`);
         setData(response.data);
         setError(null);
-        console.log(data);
       } catch (err) {
         setError(err.message);
         setData(null);
@@ -101,7 +104,10 @@ function PlayerList({ teamCode }) {
                   })
                   .map((val) => {
                     return (
-                      <tr key={val.id}>
+                      <tr
+                        key={val.id}
+                        onClick={() => handleAddingPlayer(val.id)}
+                      >
                         {columns.map(({ accessor }) => {
                           const tData = val[accessor] ? val[accessor] : "0";
                           return <td key={accessor}>{tData}</td>;
@@ -122,7 +128,10 @@ function PlayerList({ teamCode }) {
                   })
                   .map((val) => {
                     return (
-                      <tr key={val.id}>
+                      <tr
+                        key={val.id}
+                        onClick={() => handleAddingPlayer(val.id)}
+                      >
                         {columns.map(({ accessor }) => {
                           const tData = val[accessor] ? val[accessor] : "0";
                           return <td key={accessor}>{tData}</td>;
@@ -137,7 +146,7 @@ function PlayerList({ teamCode }) {
                 !filterStr &&
                 data.map((val) => {
                   return (
-                    <tr key={val.id}>
+                    <tr key={val.id} onClick={() => handleAddingPlayer(val.id)}>
                       {columns.map(({ accessor }) => {
                         const tData = val[accessor] ? val[accessor] : "0";
                         return <td key={accessor}>{tData}</td>;
@@ -155,7 +164,10 @@ function PlayerList({ teamCode }) {
                   )
                   .map((val) => {
                     return (
-                      <tr key={val.id}>
+                      <tr
+                        key={val.id}
+                        onClick={() => handleAddingPlayer(val.id)}
+                      >
                         {columns.map(({ accessor }) => {
                           const tData = val[accessor] ? val[accessor] : "0";
                           return <td key={accessor}>{tData}</td>;
