@@ -40,7 +40,7 @@ def savePlayers():
             team_code = setTeamCode(player['team_code'])
             points = player['total_points']
             position = player['element_type']
-            price = player['now_cost']
+            price = player['now_cost']/10
             p = Player(id=id, web_name = name, goals_scored = goals, assists = assists, team_code = team_code, total_points = points, position = position, price = price)
             p.save()
 

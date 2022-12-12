@@ -4,13 +4,16 @@ import Player from "../components/Player";
 import "../css/TF.css";
 import PlayerList from "../components/PlayerList";
 import FilterByTeam from "../components/FilterByTeam";
+import ModalTF from "../components/ModalTF";
 
 function TransferPlanner({ team_id }) {
-  const [team, setTeam] = useState({});
   const [selected, setSelected] = useState("");
   const [teamValue, setTeamValue] = useState(0);
   const [bankValue, setBankValue] = useState(0);
-  const [blankPlayerKey, setBlankPlayerKey] = useState(null);
+  const [bankValueCopy, setBankValueCopy] = useState(0);
+  const [blankPlayersArrayKey, setBlankPlayersArrayKey] = useState([]);
+  // const [array, setArray] = useState([])
+  // const [positionValue, setPosition]
   const [players, setPlayers] = useState([
     {
       id: null,
@@ -103,21 +106,22 @@ function TransferPlanner({ team_id }) {
       vcpt: false,
     },
   ]);
+  const [playersCopy, setPlayersCopy] = useState(players);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     const getData = async () => {
+      setIsLoading(true);
       try {
-        setIsLoading(true);
         const response = await axios.get(
           `http://localhost:8000/api/user-picks/${team_id}`
         );
         const resp = response.data;
         setTeamValue(resp["team_value"]);
         setBankValue(resp["bank_value"]);
-        setTeam({ ...response.data });
+        setBankValueCopy(resp["bank_value"]);
         const players = [
           {
             id: resp["p1"],
@@ -211,52 +215,84 @@ function TransferPlanner({ team_id }) {
           },
         ];
         setPlayers(players);
+        setPlayersCopy(players);
         setIsError(false);
       } catch (err) {
         setIsError(true);
-        setTeam(null);
       } finally {
         setIsLoading(false);
       }
     };
     getData();
-  }, []);
+  }, [team_id]);
 
-  const removePlayer = (playerId) => {
-    const newPlayers = [...players];
-    newPlayers[playerId] = { id: null, cpt: false, vcpt: false };
-    setPlayers(newPlayers);
-    setBlankPlayerKey(playerId);
+  const removePlayer = (playerId, price) => {
+    if (playersCopy[playerId].id !== null) {
+      const newPlayers = [...playersCopy];
+      newPlayers[playerId] = { id: null, cpt: false, vcpt: false };
+      setPlayersCopy(newPlayers);
+      setBlankPlayersArrayKey([...blankPlayersArrayKey, playerId]);
+      setBankValue(bankValue + price);
+    }
   };
 
   const addPlayer = (playerId) => {
-    const newPlayers = [...players];
-    newPlayers[blankPlayerKey] = { id: playerId };
-    setPlayers(newPlayers);
-    setBlankPlayerKey(null);
+    const newPlayers = [...playersCopy];
+    const getData = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/api/player/${playerId}`
+        );
+        setBankValue(bankValue - response.data["price"]);
+      } catch (err) {
+        console.log(err.message);
+      }
+    };
+    if (blankPlayersArrayKey.length > 0) {
+      newPlayers[blankPlayersArrayKey.at(-1)] = { id: playerId };
+      setPlayersCopy(newPlayers);
+      setBlankPlayersArrayKey(blankPlayersArrayKey.slice(0, -1));
+      getData();
+    }
+  };
+
+  const validationCheck = (bank_value) => {
+    if (bank_value < 0) {
+      alert("Total Value under 0$");
+      setPlayersCopy(players);
+      setBankValue(bankValueCopy);
+    }
   };
 
   return (
     <>
       <h4>{isLoading ? "...Fetching" : "Loaded"}</h4>
-      <h2>TransferPlanner</h2>
-      <h2>{team_id}</h2>
-      <h4>{teamValue}</h4>
-      <h4>{bankValue}</h4>
-      {players.filter((player) => player.id !== null).length > 0 && (
-        <div className="planner">
-          {players.map((player, i) => (
-            <Player
-              key={i}
-              {...player}
-              playerkey={i}
-              removePlayer={removePlayer}
-            />
-          ))}
+      {isLoading || (
+        <div>
+          <h2>TransferPlanner</h2>
+          <h2>{team_id}</h2>
+          <h4>{teamValue} $</h4>
+          <h4>{bankValue.toFixed(1)} $</h4>
+          {playersCopy.filter((player) => player.id !== null).length > 0 && (
+            <div className="planner">
+              {playersCopy.map((player, i) => (
+                <Player
+                  key={i}
+                  {...player}
+                  playerkey={i}
+                  removePlayer={removePlayer}
+                />
+              ))}
+            </div>
+          )}
+          {/* <ModalTF /> */}
+          <button type="button" onClick={() => validationCheck(bankValue)}>
+            Submit changes
+          </button>
+          <FilterByTeam selected={selected} setSelected={setSelected} />
+          <PlayerList teamCode={selected} addPlayer={addPlayer} />
         </div>
       )}
-      <FilterByTeam selected={selected} setSelected={setSelected} />
-      <PlayerList teamCode={selected} addPlayer={addPlayer} />
     </>
   );
 }

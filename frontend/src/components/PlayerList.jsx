@@ -21,9 +21,11 @@ function PlayerList({ teamCode, addPlayer }) {
     { label: "Assists", accessor: "assists" },
     { label: "Points", accessor: "total_points" },
     { label: "Team", accessor: "team_code" },
+    { label: "Price", accessor: "price" },
   ];
 
   const handleAddingPlayer = (playerId) => {
+    console.log(playerId);
     addPlayer(playerId);
   };
 
@@ -42,7 +44,6 @@ function PlayerList({ teamCode, addPlayer }) {
     };
     getData();
   }, [loading]);
-
   const handleSorting = (sortField, sortOrder) => {
     if (sortField) {
       const sorted = [...data].sort((a, b) => {

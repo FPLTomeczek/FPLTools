@@ -53,16 +53,6 @@ tr:hover {
   padding: 10px;
   cursor: pointer;
 }
-.player {
-  border: 1px solid red;
-  text-align: center;
-}
-
-.player #shirt {
-  width: 100px;
-  height: auto;
-}
-
 .th-container {
   display: flex;
   justify-content: center;
