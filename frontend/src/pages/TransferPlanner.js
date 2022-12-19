@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import Player from "../components/Player";
 import "../css/TF.css";
@@ -12,100 +12,19 @@ function TransferPlanner({ team_id }) {
   const [bankValue, setBankValue] = useState(0);
   const [bankValueCopy, setBankValueCopy] = useState(0);
   const [blankPlayersArrayKey, setBlankPlayersArrayKey] = useState([]);
+  const [availableTransfers, setAvailableTransfers] = useState(1);
+  const [costOfTransfers, setCostOfTransfers] = useState(0);
+  const [playersToRevert, setPlayersToRevert] = useState([]);
   // const [array, setArray] = useState([])
   // const [positionValue, setPosition]
-  const [players, setPlayers] = useState([
-    {
+  const [players, setPlayers] = useState(
+    Array(15).fill({
       id: null,
       pos: null,
       cpt: false,
       vcpt: false,
-    },
-    {
-      id: null,
-      pos: null,
-      cpt: false,
-      vcpt: false,
-    },
-    {
-      id: null,
-      pos: null,
-      cpt: false,
-      vcpt: false,
-    },
-    {
-      id: null,
-      pos: null,
-      cpt: false,
-      vcpt: false,
-    },
-    {
-      id: null,
-      pos: null,
-      cpt: false,
-      vcpt: false,
-    },
-    {
-      id: null,
-      pos: null,
-      cpt: false,
-      vcpt: false,
-    },
-    {
-      id: null,
-      pos: null,
-      cpt: false,
-      vcpt: false,
-    },
-    {
-      id: null,
-      pos: null,
-      cpt: false,
-      vcpt: false,
-    },
-    {
-      id: null,
-      pos: null,
-      cpt: false,
-      vcpt: false,
-    },
-    {
-      id: null,
-      pos: null,
-      cpt: false,
-      vcpt: false,
-    },
-    {
-      id: null,
-      pos: null,
-      cpt: false,
-      vcpt: false,
-    },
-    {
-      id: null,
-      pos: null,
-      cpt: false,
-      vcpt: false,
-    },
-    {
-      id: null,
-      pos: null,
-      cpt: false,
-      vcpt: false,
-    },
-    {
-      id: null,
-      pos: null,
-      cpt: false,
-      vcpt: false,
-    },
-    {
-      id: null,
-      pos: null,
-      cpt: false,
-      vcpt: false,
-    },
-  ]);
+    })
+  );
   const [playersCopy, setPlayersCopy] = useState(players);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -228,20 +147,25 @@ function TransferPlanner({ team_id }) {
 
   const removePlayer = (playerId, price) => {
     if (playersCopy[playerId].id !== null) {
+      const actualID = playersCopy[playerId].id;
       const newPlayers = [...playersCopy];
       newPlayers[playerId] = { id: null, cpt: false, vcpt: false };
       setPlayersCopy(newPlayers);
       setBlankPlayersArrayKey([...blankPlayersArrayKey, playerId]);
       setBankValue(bankValue + price);
+      setPlayersToRevert([...playersToRevert, { playerId, actualID }]);
+      makeTransfer(actualID, players[playerId].id);
     }
   };
 
-  const addPlayer = (playerId) => {
+  const addPlayer = (playerID) => {
+    // usun z listy playerRevert po playerKey
+
     const newPlayers = [...playersCopy];
     const getData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/player/${playerId}`
+          `http://localhost:8000/api/player/${playerID}`
         );
         setBankValue(bankValue - response.data["price"]);
       } catch (err) {
@@ -249,11 +173,45 @@ function TransferPlanner({ team_id }) {
       }
     };
     if (blankPlayersArrayKey.length > 0) {
-      newPlayers[blankPlayersArrayKey.at(-1)] = { id: playerId };
+      newPlayers[blankPlayersArrayKey.at(-1)] = { id: playerID };
       setPlayersCopy(newPlayers);
       setBlankPlayersArrayKey(blankPlayersArrayKey.slice(0, -1));
       getData();
+      const lastKey = blankPlayersArrayKey.pop();
+      console.log(lastKey);
+      const newPlayersToRevert = playersToRevert.filter(
+        (playerToRevert) => playerToRevert.playerId !== lastKey
+      );
+      setPlayersToRevert(newPlayersToRevert);
+      console.log(playersToRevert);
     }
+  };
+
+  const revertPlayer = (id) => {
+    const newPlayers = [...playersCopy];
+    console.log(id);
+    const playerID = players[id].id;
+    console.log(playersCopy);
+    console.log(playerID);
+    const getPrice = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/api/player/${playerID}`
+        );
+        setBankValue(bankValue - response.data["price"]);
+      } catch (err) {
+        console.log(err.message);
+      }
+    };
+    getPrice();
+    newPlayers[id] = { id: playerID };
+    setPlayersCopy(newPlayers);
+    setBlankPlayersArrayKey(blankPlayersArrayKey.slice(0, -1));
+    const newPlayersToRevert = playersToRevert.filter(
+      (playerToRevert) => playerToRevert.playerId !== id
+    );
+    setPlayersToRevert(newPlayersToRevert);
+    undoTransfer();
   };
 
   const validationCheck = (bank_value) => {
@@ -261,6 +219,22 @@ function TransferPlanner({ team_id }) {
       alert("Total Value under 0$");
       setPlayersCopy(players);
       setBankValue(bankValueCopy);
+    }
+  };
+
+  const makeTransfer = (actualID, initialActualID) => {
+    if (actualID === initialActualID) {
+      setAvailableTransfers(availableTransfers - 1);
+      if (availableTransfers <= 0) {
+        setCostOfTransfers(costOfTransfers - 4);
+      }
+    }
+  };
+
+  const undoTransfer = () => {
+    setAvailableTransfers(availableTransfers + 1);
+    if (availableTransfers < 0) {
+      setCostOfTransfers(costOfTransfers + 4);
     }
   };
 
@@ -273,16 +247,28 @@ function TransferPlanner({ team_id }) {
           <h2>{team_id}</h2>
           <h4>{teamValue} $</h4>
           <h4>{bankValue.toFixed(1)} $</h4>
+          <h4>Cost: {costOfTransfers}</h4>
+          <h4>Available Transfers: {availableTransfers}</h4>
           {playersCopy.filter((player) => player.id !== null).length > 0 && (
             <div className="planner">
-              {playersCopy.map((player, i) => (
-                <Player
-                  key={i}
-                  {...player}
-                  playerkey={i}
-                  removePlayer={removePlayer}
-                />
-              ))}
+              {console.log(playersToRevert)}
+              {playersCopy.map((player, i) => {
+                const isToRevert = playersToRevert.find(
+                  (player) => player.playerId === i
+                )
+                  ? true
+                  : false;
+                return (
+                  <Player
+                    key={i}
+                    {...player}
+                    playerkey={i}
+                    removePlayer={removePlayer}
+                    isToRevert={isToRevert}
+                    revertPlayer={revertPlayer}
+                  />
+                );
+              })}
             </div>
           )}
           {/* <ModalTF /> */}

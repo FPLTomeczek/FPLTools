@@ -1,9 +1,19 @@
 import React, { useState } from "react";
 import { RiTShirt2Line } from "react-icons/ri";
+import { GrRevert } from "react-icons/gr";
 import { useEffect } from "react";
 import axios from "axios";
 
-function Player({ id, pos, cpt, vcpt, playerkey, removePlayer }) {
+function Player({
+  id,
+  pos,
+  cpt,
+  vcpt,
+  playerkey,
+  removePlayer,
+  isToRevert,
+  revertPlayer,
+}) {
   // get player by ID
   const [name, setName] = useState("");
   const [points, setPoints] = useState(0);
@@ -13,10 +23,10 @@ function Player({ id, pos, cpt, vcpt, playerkey, removePlayer }) {
   const [position, setPosition] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const getData = async () => {
+  const getData = async (playerID) => {
     try {
       const response = await axios.get(
-        `http://localhost:8000/api/player/${id}`
+        `http://localhost:8000/api/player/${playerID}`
       );
       setName(response.data["web_name"]);
       setPoints(response.data["total_points"]);
@@ -31,12 +41,11 @@ function Player({ id, pos, cpt, vcpt, playerkey, removePlayer }) {
       setTeam("");
       setPrice(0);
       setPosition(0);
-      setIsLoaded(false);
     }
   };
 
   useEffect(() => {
-    getData();
+    getData(id);
   }, [id]);
 
   useEffect(() => {
@@ -60,8 +69,12 @@ function Player({ id, pos, cpt, vcpt, playerkey, removePlayer }) {
     getStyle(position);
   }, [position]);
 
-  const handleClick = () => {
+  const handleRemovePlayer = () => {
     removePlayer(playerkey, price);
+  };
+
+  const handleRevertPlayer = (playerKey, playerID) => {
+    revertPlayer(playerKey, playerID);
   };
 
   return (
@@ -69,12 +82,20 @@ function Player({ id, pos, cpt, vcpt, playerkey, removePlayer }) {
       {isLoaded && (
         <div>
           <div className="player" style={{ backgroundColor: color }}>
-            <RiTShirt2Line id="shirt" onClick={handleClick} />
-            <h4>{name}</h4>
+            {isToRevert ? (
+              <GrRevert
+                className="revert-btn"
+                onClick={() => handleRevertPlayer(playerkey, id)}
+              />
+            ) : (
+              <RiTShirt2Line
+                className="shirt-btn"
+                onClick={handleRemovePlayer}
+              />
+            )}
+            <h4>{name || "Pick Player"}</h4>
             <h4>{points}</h4>
             <h4>{team}</h4>
-            <h4>{playerkey}</h4>
-            <h4>{position}</h4>
           </div>
         </div>
       )}
