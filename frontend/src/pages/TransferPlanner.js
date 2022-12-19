@@ -5,6 +5,7 @@ import "../css/TF.css";
 import PlayerList from "../components/PlayerList";
 import FilterByTeam from "../components/FilterByTeam";
 import ModalTF from "../components/ModalTF";
+import Team from "../components/Team";
 
 function TransferPlanner({ team_id }) {
   const [selected, setSelected] = useState("");
@@ -15,8 +16,6 @@ function TransferPlanner({ team_id }) {
   const [availableTransfers, setAvailableTransfers] = useState(1);
   const [costOfTransfers, setCostOfTransfers] = useState(0);
   const [playersToRevert, setPlayersToRevert] = useState([]);
-  // const [array, setArray] = useState([])
-  // const [positionValue, setPosition]
   const [players, setPlayers] = useState(
     Array(15).fill({
       id: null,
@@ -26,7 +25,6 @@ function TransferPlanner({ team_id }) {
     })
   );
   const [playersCopy, setPlayersCopy] = useState(players);
-
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
@@ -145,22 +143,7 @@ function TransferPlanner({ team_id }) {
     getData();
   }, [team_id]);
 
-  const removePlayer = (playerId, price) => {
-    if (playersCopy[playerId].id !== null) {
-      const actualID = playersCopy[playerId].id;
-      const newPlayers = [...playersCopy];
-      newPlayers[playerId] = { id: null, cpt: false, vcpt: false };
-      setPlayersCopy(newPlayers);
-      setBlankPlayersArrayKey([...blankPlayersArrayKey, playerId]);
-      setBankValue(bankValue + price);
-      setPlayersToRevert([...playersToRevert, { playerId, actualID }]);
-      makeTransfer(actualID, players[playerId].id);
-    }
-  };
-
   const addPlayer = (playerID) => {
-    // usun z listy playerRevert po playerKey
-
     const newPlayers = [...playersCopy];
     const getData = async () => {
       try {
@@ -184,6 +167,19 @@ function TransferPlanner({ team_id }) {
       );
       setPlayersToRevert(newPlayersToRevert);
       console.log(playersToRevert);
+    }
+  };
+
+  const removePlayer = (playerId, price) => {
+    if (playersCopy[playerId].id !== null) {
+      const actualID = playersCopy[playerId].id;
+      const newPlayers = [...playersCopy];
+      newPlayers[playerId] = { id: null, cpt: false, vcpt: false };
+      setPlayersCopy(newPlayers);
+      setBlankPlayersArrayKey([...blankPlayersArrayKey, playerId]);
+      setBankValue(bankValue + price);
+      setPlayersToRevert([...playersToRevert, { playerId, actualID }]);
+      makeTransfer(actualID, players[playerId].id);
     }
   };
 
@@ -214,14 +210,6 @@ function TransferPlanner({ team_id }) {
     undoTransfer();
   };
 
-  const validationCheck = (bank_value) => {
-    if (bank_value < 0) {
-      alert("Total Value under 0$");
-      setPlayersCopy(players);
-      setBankValue(bankValueCopy);
-    }
-  };
-
   const makeTransfer = (actualID, initialActualID) => {
     if (actualID === initialActualID) {
       setAvailableTransfers(availableTransfers - 1);
@@ -238,6 +226,14 @@ function TransferPlanner({ team_id }) {
     }
   };
 
+  const validationCheck = (bank_value) => {
+    if (bank_value < 0) {
+      alert("Total Value under 0$");
+      setPlayersCopy(players);
+      setBankValue(bankValueCopy);
+    }
+  };
+
   return (
     <>
       <h4>{isLoading ? "...Fetching" : "Loaded"}</h4>
@@ -249,28 +245,13 @@ function TransferPlanner({ team_id }) {
           <h4>{bankValue.toFixed(1)} $</h4>
           <h4>Cost: {costOfTransfers}</h4>
           <h4>Available Transfers: {availableTransfers}</h4>
-          {playersCopy.filter((player) => player.id !== null).length > 0 && (
-            <div className="planner">
-              {console.log(playersToRevert)}
-              {playersCopy.map((player, i) => {
-                const isToRevert = playersToRevert.find(
-                  (player) => player.playerId === i
-                )
-                  ? true
-                  : false;
-                return (
-                  <Player
-                    key={i}
-                    {...player}
-                    playerkey={i}
-                    removePlayer={removePlayer}
-                    isToRevert={isToRevert}
-                    revertPlayer={revertPlayer}
-                  />
-                );
-              })}
-            </div>
-          )}
+          <Team
+            playersCopy={playersCopy}
+            removePlayer={removePlayer}
+            revertPlayer={revertPlayer}
+            playersToRevert={playersToRevert}
+          />
+
           {/* <ModalTF /> */}
           <button type="button" onClick={() => validationCheck(bankValue)}>
             Submit changes
