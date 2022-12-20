@@ -1,9 +1,9 @@
 import requests
 
-def getPlayer():
+def getPlayer(id):
     base_url = 'https://fantasy.premierleague.com/api/'
     r = requests.get(base_url+'bootstrap-static/').json()
-    player = r['elements'][0]
+    player = r['elements'][id]
     print(player['web_name'], player['goals_scored'], player['assists'], player['team_code'], player['total_points'])     
     return player  
 
@@ -31,4 +31,4 @@ def getTeamBankValue(id, curr_week):
     bank = my_team_data['bank']/10
     return value, bank
 
-getTeamBankValue(7770, 16)
+getPlayer(19)

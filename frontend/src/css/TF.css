@@ -1,17 +1,92 @@
 .planner {
   display: flex;
   width: auto;
+  justify-content: center;
 }
+
+/* player */
 .player {
   text-align: center;
   padding: 10px 0px;
   border-right: 5px solid black;
 }
-.revert-btn,
-.shirt-btn {
+.revert-btn {
   width: 100px;
   height: auto;
 }
-#player1.player {
+.shirt-btn {
+  width: 100px;
+  height: auto;
+  /* color: blue; */
+}
+.player#player-10 {
+  margin-right: 50px;
+}
+.player#player-0 {
   border-left: 5px solid black;
+}
+.player#player-11 {
+  border-left: 5px solid black;
+}
+
+.gameweek {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.left-arrow-btn {
+  margin-right: 20px;
+  cursor: pointer;
+}
+.right-arrow-btn {
+  margin-left: 20px;
+  cursor: pointer;
+}
+
+.submit-button {
+  display: flex;
+  width: auto;
+  background-color: var(--clr-primary-5);
+  border-radius: var(--radius);
+  text-transform: capitalize;
+  color: var(--clr-white);
+  letter-spacing: var(--spacing);
+  border-color: transparent;
+  cursor: pointer;
+  font-size: 2.1rem;
+  height: 3rem;
+  justify-content: center;
+}
+
+.submit-button-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.playerListTable {
+  width: 100%;
+}
+
+/* filter buttons */
+
+.select-team {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  margin-left: 10px;
+  height: 40px;
+}
+.player-name {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  margin-left: 10px;
+  height: 40px;
+}
+.select-team h4 {
+  margin-right: 5px;
+}
+.player-name h4 {
+  margin-right: 8px;
 }

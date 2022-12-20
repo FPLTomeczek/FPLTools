@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { RiTShirt2Line } from "react-icons/ri";
+import { FaTshirt } from "react-icons/fa";
+import { RiArrowDropDownLine, RiTShirt2Fill } from "react-icons/ri";
 import { GrRevert } from "react-icons/gr";
 import { useEffect } from "react";
 import axios from "axios";
+import { IconContext } from "react-icons";
 
 function Player({
   id,
@@ -13,6 +15,8 @@ function Player({
   removePlayer,
   isToRevert,
   revertPlayer,
+  addRole,
+  validationCheck,
 }) {
   // get player by ID
   const [name, setName] = useState("");
@@ -20,6 +24,7 @@ function Player({
   const [team, setTeam] = useState("");
   const [price, setPrice] = useState(0);
   const [color, setColor] = useState("");
+  const [shirtColor, setShirtColor] = useState("");
   const [position, setPosition] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -69,6 +74,75 @@ function Player({
     getStyle(position);
   }, [position]);
 
+  useEffect(() => {
+    const getStyle = (team) => {
+      switch (team) {
+        case "Arsenal":
+          setShirtColor("#FF1818");
+          break;
+        case "Aston Villa":
+          setShirtColor("#64203F");
+          break;
+        case "Chelsea":
+          setShirtColor("#003AAF");
+          break;
+        case "Bournemouth":
+          setShirtColor("#780112");
+          break;
+        case "Brentford":
+          setShirtColor("#E60022");
+          break;
+        case "Brighton":
+          setShirtColor("#3164FF");
+          break;
+        case "Crystal Palace":
+          setShirtColor("#6E007D");
+          break;
+        case "Everton":
+          setShirtColor("#0014A6");
+          break;
+        case "Fulham":
+          setShirtColor("#EEF0FF");
+          break;
+        case "Leeds":
+          setShirtColor("#D3D3D3");
+          break;
+        case "Leicester":
+          setShirtColor("#465BFA");
+          break;
+        case "Liverpool":
+          setShirtColor("#DC0000");
+          break;
+        case "Newcastle":
+          setShirtColor("#333131");
+          break;
+        case "Nottingham Forest":
+          setShirtColor("#FF3E3E");
+          break;
+        case "Southampton":
+          setShirtColor("#E63131");
+          break;
+        case "West Ham":
+          setShirtColor("#682B00");
+          break;
+        case "Wolverhampton":
+          setShirtColor("#3164FF");
+          break;
+        case "Man United":
+          setShirtColor("#C40000");
+          break;
+        case "Man City":
+          setShirtColor("#4DFFFE");
+          break;
+        case "Spurs":
+          setShirtColor("#FFFFFF");
+          break;
+        default:
+      }
+    };
+    getStyle(team);
+  }, [team]);
+
   const handleRemovePlayer = () => {
     removePlayer(playerkey, price);
   };
@@ -81,16 +155,21 @@ function Player({
     <div>
       {isLoaded && (
         <div>
-          <div className="player" style={{ backgroundColor: color }}>
+          <div
+            className="player"
+            id={`player-${playerkey}`}
+            style={{ backgroundColor: color }}
+          >
             {isToRevert ? (
               <GrRevert
                 className="revert-btn"
                 onClick={() => handleRevertPlayer(playerkey, id)}
               />
             ) : (
-              <RiTShirt2Line
-                className="shirt-btn"
+              <RiTShirt2Fill
                 onClick={handleRemovePlayer}
+                className="shirt-btn"
+                style={{ color: shirtColor }}
               />
             )}
             <h4>{name || "Pick Player"}</h4>

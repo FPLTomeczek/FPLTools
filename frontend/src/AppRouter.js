@@ -8,13 +8,19 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function AppRouter() {
   const [id, setId] = useState(0);
+  const initialGameweek = 16;
   return (
     <BrowserRouter>
       <Navbar />
       <Routes>
         <Route path="/" element={<EntryPage id={id} setId={setId} />} />
         <Route path="/stats" element={<Stats />} />
-        <Route path="/tf" element={<TransferPlanner team_id={id} />} />
+        <Route
+          path="/tf"
+          element={
+            <TransferPlanner team_id={id} initialGameweek={initialGameweek} />
+          }
+        />
         <Route path="/injuries" element={<Injuries />} />
       </Routes>
     </BrowserRouter>

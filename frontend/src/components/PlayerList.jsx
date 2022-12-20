@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
+import FilterByTeam from "./FilterByTeam";
 
-function PlayerList({ teamCode, addPlayer }) {
-  // basic fetch
-
-  // fetch('https://api.github.com/users/eunit99/repos')
-  //   .then(response => response.json())
-  //   .then(data => console.log(data));
+function PlayerList({ addPlayer }) {
+  const [selected, setSelected] = useState("");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -24,9 +21,9 @@ function PlayerList({ teamCode, addPlayer }) {
     { label: "Price", accessor: "price" },
   ];
 
-  const handleAddingPlayer = (playerId) => {
-    console.log(playerId);
-    addPlayer(playerId);
+  const handleAddingPlayer = (playerId, playerPosition) => {
+    console.log(playerId, playerPosition);
+    addPlayer(playerId, playerPosition);
   };
 
   useEffect(() => {
@@ -66,13 +63,23 @@ function PlayerList({ teamCode, addPlayer }) {
   };
 
   return (
-    <div className="PlayerList">
-      <input
-        type="text"
-        value={filterStr}
-        onChange={(e) => setFilterStr(e.target.value)}
-      ></input>
-      <div className="PlayerListTable">
+    <div className="playerList">
+      <div className="filters">
+        <div className="select-team">
+          <h4>Select Team: </h4>
+          <FilterByTeam selected={selected} setSelected={setSelected} />
+        </div>
+        <div className="player-name">
+          <h4>Player name </h4>
+          <input
+            type="text"
+            value={filterStr}
+            placeholder="Enter player name"
+            onChange={(e) => setFilterStr(e.target.value)}
+          ></input>
+        </div>
+      </div>
+      <div className="playerListTable">
         <table>
           <thead>
             <tr>
@@ -95,19 +102,19 @@ function PlayerList({ teamCode, addPlayer }) {
               })}
             </tr>
           </thead>
-          {teamCode ? (
+          {selected ? (
             <tbody>
               {data &&
                 !filterStr &&
                 data
                   .filter((player) => {
-                    return player.team_code === teamCode;
+                    return player.team_code === selected;
                   })
                   .map((val) => {
                     return (
                       <tr
                         key={val.id}
-                        onClick={() => handleAddingPlayer(val.id)}
+                        onClick={() => handleAddingPlayer(val.id, val.position)}
                       >
                         {columns.map(({ accessor }) => {
                           const tData = val[accessor] ? val[accessor] : "0";
@@ -121,7 +128,7 @@ function PlayerList({ teamCode, addPlayer }) {
                 data
                   .filter((player) => {
                     return (
-                      player.team_code === teamCode &&
+                      player.team_code === selected &&
                       player.web_name
                         .toLowerCase()
                         .includes(filterStr.toLowerCase())
@@ -131,7 +138,7 @@ function PlayerList({ teamCode, addPlayer }) {
                     return (
                       <tr
                         key={val.id}
-                        onClick={() => handleAddingPlayer(val.id)}
+                        onClick={() => handleAddingPlayer(val.id, val.position)}
                       >
                         {columns.map(({ accessor }) => {
                           const tData = val[accessor] ? val[accessor] : "0";
@@ -147,7 +154,10 @@ function PlayerList({ teamCode, addPlayer }) {
                 !filterStr &&
                 data.map((val) => {
                   return (
-                    <tr key={val.id} onClick={() => handleAddingPlayer(val.id)}>
+                    <tr
+                      key={val.id}
+                      onClick={() => handleAddingPlayer(val.id, val.position)}
+                    >
                       {columns.map(({ accessor }) => {
                         const tData = val[accessor] ? val[accessor] : "0";
                         return <td key={accessor}>{tData}</td>;
@@ -167,7 +177,7 @@ function PlayerList({ teamCode, addPlayer }) {
                     return (
                       <tr
                         key={val.id}
-                        onClick={() => handleAddingPlayer(val.id)}
+                        onClick={() => handleAddingPlayer(val.id, val.position)}
                       >
                         {columns.map(({ accessor }) => {
                           const tData = val[accessor] ? val[accessor] : "0";

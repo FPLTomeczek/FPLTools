@@ -6,9 +6,9 @@ import PlayerList from "../components/PlayerList";
 import FilterByTeam from "../components/FilterByTeam";
 import ModalTF from "../components/ModalTF";
 import Team from "../components/Team";
+import { BsArrowLeftSquareFill, BsArrowRightSquareFill } from "react-icons/bs";
 
-function TransferPlanner({ team_id }) {
-  const [selected, setSelected] = useState("");
+function TransferPlanner({ team_id, initialGameweek }) {
   const [teamValue, setTeamValue] = useState(0);
   const [bankValue, setBankValue] = useState(0);
   const [bankValueCopy, setBankValueCopy] = useState(0);
@@ -16,12 +16,15 @@ function TransferPlanner({ team_id }) {
   const [availableTransfers, setAvailableTransfers] = useState(1);
   const [costOfTransfers, setCostOfTransfers] = useState(0);
   const [playersToRevert, setPlayersToRevert] = useState([]);
+  const [gameweekCounter, setGameweekCounter] = useState(initialGameweek);
+  const [role, setRole] = useState([]);
   const [players, setPlayers] = useState(
     Array(15).fill({
       id: null,
       pos: null,
       cpt: false,
       vcpt: false,
+      role: "",
     })
   );
   const [playersCopy, setPlayersCopy] = useState(players);
@@ -143,30 +146,129 @@ function TransferPlanner({ team_id }) {
     getData();
   }, [team_id]);
 
-  const addPlayer = (playerID) => {
-    const newPlayers = [...playersCopy];
-    const getData = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8000/api/player/${playerID}`
+  const checkPlayerRoles = (dict) => {
+    if (dict[1] !== 2 || dict[2] !== 5 || dict[3] !== 5 || dict[4] !== 3) {
+      alert(
+        "Wrong Positions of Player!\nRequired Playes Roles:\nGoalkeepers: 1\nDefenders: 5\nMidfielders: 5\nForwards: 3"
+      );
+      setPlayersCopy(players);
+      setBankValue(bankValueCopy);
+    }
+  };
+
+  const firstElevenPlayersSort = (playersCopy, response) => {
+    const sortedEleven = playersCopy
+      .filter((player) => player.pos < 12)
+      .sort((a, b) => {
+        console.log(a.id);
+        console.log(b.id);
+        return (
+          response.data[a.id - 1].position - response.data[b.id - 1].position
         );
-        setBankValue(bankValue - response.data["price"]);
-      } catch (err) {
-        console.log(err.message);
+      });
+    const playersCopyBench = playersCopy.slice(11, 15);
+    const newPlayersArray = [...sortedEleven, ...playersCopyBench];
+    console.log(sortedEleven);
+    console.log(response.data[playersCopy[4].id - 1].position);
+
+    setPlayersCopy(newPlayersArray);
+  };
+
+  const validationCheck = (bank_value, playersCopy) => {
+    const getRole = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/api/players`);
+
+        const playerRoles = [];
+
+        playersCopy
+          .map((player) => {
+            return player.id;
+          })
+          .forEach((playerCopyID) => {
+            playerRoles.push(response.data[playerCopyID - 1].position);
+          });
+        const countRoles = playerRoles.reduce((counts, num) => {
+          if (num in counts) {
+            counts[num]++;
+          } else {
+            counts[num] = 1;
+          }
+          return counts;
+        }, {});
+        checkPlayerRoles(countRoles);
+        firstElevenPlayersSort(playersCopy, response);
+
+        // for (let i = 0; i < playersCopy.length; i++) {
+        //   console.log(response.data);
+        //   console.log(response.data[i]);
+        //   console.log(response.data[i].web_name);
+        // }
+
+        // setRole([...role, response.data["position"]]);
+        // console.log(role);
+      } catch (e) {
+        console.log(e.message);
+      } finally {
       }
     };
-    if (blankPlayersArrayKey.length > 0) {
-      newPlayers[blankPlayersArrayKey.at(-1)] = { id: playerID };
-      setPlayersCopy(newPlayers);
-      setBlankPlayersArrayKey(blankPlayersArrayKey.slice(0, -1));
-      getData();
-      const lastKey = blankPlayersArrayKey.pop();
-      console.log(lastKey);
-      const newPlayersToRevert = playersToRevert.filter(
-        (playerToRevert) => playerToRevert.playerId !== lastKey
-      );
-      setPlayersToRevert(newPlayersToRevert);
-      console.log(playersToRevert);
+    if (!isLoading) {
+      getRole();
+    }
+    console.log(role);
+    if (bank_value < 0) {
+      alert("Total Value under 0$");
+      setPlayersCopy(players);
+      setBankValue(bankValueCopy);
+    }
+  };
+  // useEffect(() => {
+  //   const getRole = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         `http://localhost:8000/api/player/${playersCopy[5].id}`
+  //       );
+  //       setRole([...role, response.data["position"]]);
+  //       console.log(role);
+  //     } catch (e) {
+  //       console.log(e.message);
+  //     }
+  //   };
+  //   if (!isLoading) {
+  //     getRole();
+  //   }
+  // }, []);
+
+  const addPlayer = (playerID, playerPosition) => {
+    const isPlayerInTeam = playersCopy.find((player) => player.id === playerID);
+    if (isPlayerInTeam) {
+      alert("Player already in Team, pick another player");
+    } else {
+      const newPlayers = [...playersCopy];
+      const getData = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8000/api/player/${playerID}`
+          );
+          setBankValue(bankValue - response.data["price"]);
+        } catch (err) {
+          console.log(err.message);
+        }
+      };
+      if (blankPlayersArrayKey.length > 0) {
+        newPlayers[blankPlayersArrayKey.at(-1)] = {
+          ...players[blankPlayersArrayKey.at(-1)],
+          id: playerID,
+        };
+        setPlayersCopy(newPlayers);
+        setBlankPlayersArrayKey(blankPlayersArrayKey.slice(0, -1));
+        getData();
+        const lastKey = blankPlayersArrayKey.pop();
+        const newPlayersToRevert = playersToRevert.filter(
+          (playerToRevert) => playerToRevert.playerId !== lastKey
+        );
+        setPlayersToRevert(newPlayersToRevert);
+      }
     }
   };
 
@@ -185,10 +287,7 @@ function TransferPlanner({ team_id }) {
 
   const revertPlayer = (id) => {
     const newPlayers = [...playersCopy];
-    console.log(id);
     const playerID = players[id].id;
-    console.log(playersCopy);
-    console.log(playerID);
     const getPrice = async () => {
       try {
         const response = await axios.get(
@@ -226,12 +325,15 @@ function TransferPlanner({ team_id }) {
     }
   };
 
-  const validationCheck = (bank_value) => {
-    if (bank_value < 0) {
-      alert("Total Value under 0$");
-      setPlayersCopy(players);
-      setBankValue(bankValueCopy);
+  const handleGameweekBackward = () => {
+    if (gameweekCounter > initialGameweek) {
+      console.log(playersCopy);
+      setGameweekCounter(gameweekCounter - 1);
     }
+  };
+
+  const handleGameweekForward = () => {
+    setGameweekCounter(gameweekCounter + 1);
   };
 
   return (
@@ -245,7 +347,20 @@ function TransferPlanner({ team_id }) {
           <h4>{bankValue.toFixed(1)} $</h4>
           <h4>Cost: {costOfTransfers}</h4>
           <h4>Available Transfers: {availableTransfers}</h4>
+          <h4>Role: {role}</h4>
+          <div className="gameweek">
+            <BsArrowLeftSquareFill
+              className="left-arrow-btn"
+              onClick={handleGameweekBackward}
+            />
+            <h3 className="gameweek-text">Gameweek {gameweekCounter}</h3>
+            <BsArrowRightSquareFill
+              className="right-arrow-btn"
+              onClick={handleGameweekForward}
+            />
+          </div>
           <Team
+            className="planner"
             playersCopy={playersCopy}
             removePlayer={removePlayer}
             revertPlayer={revertPlayer}
@@ -253,11 +368,18 @@ function TransferPlanner({ team_id }) {
           />
 
           {/* <ModalTF /> */}
-          <button type="button" onClick={() => validationCheck(bankValue)}>
-            Submit changes
-          </button>
-          <FilterByTeam selected={selected} setSelected={setSelected} />
-          <PlayerList teamCode={selected} addPlayer={addPlayer} />
+          <div className="submit-button-wrapper">
+            <button
+              type="button"
+              className="submit-button"
+              onClick={() => validationCheck(bankValue, playersCopy)}
+            >
+              Submit changes
+            </button>
+          </div>
+          <div className="stats-container-tf">
+            <PlayerList addPlayer={addPlayer} />
+          </div>
         </div>
       )}
     </>

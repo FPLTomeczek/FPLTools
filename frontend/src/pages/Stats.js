@@ -8,9 +8,6 @@ import FilterByTeam from "../components/FilterByTeam";
 function Stats() {
   const [teamCode, setTeamCode] = useState("");
   const [clubImages, setClubImages] = useState(data);
-  const handleSettingTeamCode = (team_code) => {
-    setTeamCode(team_code);
-  };
 
   return (
     <div className="stats-container">
@@ -20,7 +17,7 @@ function Stats() {
           All Clubs
         </button>
       </div>
-      <PlayerList teamCode={teamCode}></PlayerList>
+      <PlayerList></PlayerList>
     </div>
   );
 }

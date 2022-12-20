@@ -11,14 +11,7 @@ function ModalTF({ teamArray }) {
       count[team] = 1;
     }
   }
-  return (
-    <>
-      {console.log(teamArray)}
-      {Object.keys(count).map((key) => {
-        console.log(`${key}: ${count[key]}`);
-      })}
-    </>
-  );
+  return <>{Object.keys(count).map((key) => {})}</>;
 }
 
 export default ModalTF;
