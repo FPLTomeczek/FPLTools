@@ -22,7 +22,6 @@ function PlayerList({ addPlayer }) {
   ];
 
   const handleAddingPlayer = (playerId, playerPosition) => {
-    console.log(playerId, playerPosition);
     addPlayer(playerId, playerPosition);
   };
 

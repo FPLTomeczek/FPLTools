@@ -1,6 +1,9 @@
 import React, { useState } from "react";
-import { FaTshirt } from "react-icons/fa";
 import { RiArrowDropDownLine, RiTShirt2Fill } from "react-icons/ri";
+import {
+  BsFillArrowDownCircleFill,
+  BsFillArrowUpCircleFill,
+} from "react-icons/bs";
 import { GrRevert } from "react-icons/gr";
 import { useEffect } from "react";
 import axios from "axios";
@@ -17,6 +20,9 @@ function Player({
   revertPlayer,
   addRole,
   validationCheck,
+  subPlayers,
+  subOffID,
+  setSubOffID,
 }) {
   // get player by ID
   const [name, setName] = useState("");
@@ -126,7 +132,7 @@ function Player({
           setShirtColor("#682B00");
           break;
         case "Wolverhampton":
-          setShirtColor("#3164FF");
+          setShirtColor("#FFAB08");
           break;
         case "Man United":
           setShirtColor("#C40000");
@@ -151,6 +157,20 @@ function Player({
     revertPlayer(playerKey, playerID);
   };
 
+  const handleSubOff = (playerKey) => {
+    console.log(playerKey);
+    setSubOffID(playerKey);
+  };
+
+  const handleSubOn = (subOffID, playerKey) => {
+    console.log(subOffID);
+    console.log(playerKey);
+    if (subOffID !== 0) {
+      subPlayers(subOffID, playerKey);
+      setSubOffID(0);
+    }
+  };
+
   return (
     <div>
       {isLoaded && (
@@ -172,6 +192,27 @@ function Player({
                 style={{ color: shirtColor }}
               />
             )}
+            <div className="substitution-button">
+              {playerkey < 11 ? (
+                <IconContext.Provider value={{ size: "25px" }}>
+                  <div
+                    className="sub-off"
+                    onClick={() => handleSubOff(playerkey)}
+                  >
+                    <BsFillArrowDownCircleFill />
+                  </div>
+                </IconContext.Provider>
+              ) : (
+                <IconContext.Provider value={{ size: "25px" }}>
+                  <div
+                    className="sub-on"
+                    onClick={() => handleSubOn(subOffID, playerkey)}
+                  >
+                    <BsFillArrowUpCircleFill />
+                  </div>
+                </IconContext.Provider>
+              )}
+            </div>
             <h4>{name || "Pick Player"}</h4>
             <h4>{points}</h4>
             <h4>{team}</h4>

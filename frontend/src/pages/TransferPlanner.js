@@ -24,7 +24,6 @@ function TransferPlanner({ team_id, initialGameweek }) {
       pos: null,
       cpt: false,
       vcpt: false,
-      role: "",
     })
   );
   const [playersCopy, setPlayersCopy] = useState(players);
@@ -151,30 +150,42 @@ function TransferPlanner({ team_id, initialGameweek }) {
       alert(
         "Wrong Positions of Player!\nRequired Playes Roles:\nGoalkeepers: 1\nDefenders: 5\nMidfielders: 5\nForwards: 3"
       );
-      setPlayersCopy(players);
+      console.log("players");
+      console.log(players);
+      // setPlayersCopy(players);
       setBankValue(bankValueCopy);
+      setCostOfTransfers(0);
+      setAvailableTransfers(1);
+      return true;
     }
+    return false;
   };
 
-  const firstElevenPlayersSort = (playersCopy, response) => {
+  const firstElevenPlayersSort = (playersCopy, response, countRoles) => {
+    const flag = checkPlayerRoles(countRoles);
+    if (flag) {
+      playersCopy = players;
+    }
+    console.log("players in sort");
+    console.log(players);
+    console.log("playersCopy in sort");
+    console.log(playersCopy);
     const sortedEleven = playersCopy
       .filter((player) => player.pos < 12)
       .sort((a, b) => {
-        console.log(a.id);
-        console.log(b.id);
         return (
           response.data[a.id - 1].position - response.data[b.id - 1].position
         );
       });
     const playersCopyBench = playersCopy.slice(11, 15);
     const newPlayersArray = [...sortedEleven, ...playersCopyBench];
-    console.log(sortedEleven);
-    console.log(response.data[playersCopy[4].id - 1].position);
 
     setPlayersCopy(newPlayersArray);
   };
 
   const validationCheck = (bank_value, playersCopy) => {
+    console.log("playersCopy in validationCheck");
+    console.log(playersCopy);
     const getRole = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/api/players`);
@@ -188,6 +199,7 @@ function TransferPlanner({ team_id, initialGameweek }) {
           .forEach((playerCopyID) => {
             playerRoles.push(response.data[playerCopyID - 1].position);
           });
+
         const countRoles = playerRoles.reduce((counts, num) => {
           if (num in counts) {
             counts[num]++;
@@ -196,30 +208,21 @@ function TransferPlanner({ team_id, initialGameweek }) {
           }
           return counts;
         }, {});
-        checkPlayerRoles(countRoles);
-        firstElevenPlayersSort(playersCopy, response);
 
-        // for (let i = 0; i < playersCopy.length; i++) {
-        //   console.log(response.data);
-        //   console.log(response.data[i]);
-        //   console.log(response.data[i].web_name);
-        // }
-
-        // setRole([...role, response.data["position"]]);
-        // console.log(role);
+        firstElevenPlayersSort(playersCopy, response, countRoles);
       } catch (e) {
         console.log(e.message);
-      } finally {
       }
     };
     if (!isLoading) {
       getRole();
     }
-    console.log(role);
     if (bank_value < 0) {
       alert("Total Value under 0$");
       setPlayersCopy(players);
       setBankValue(bankValueCopy);
+      setCostOfTransfers(0);
+      setAvailableTransfers(1);
     }
   };
   // useEffect(() => {
@@ -309,6 +312,29 @@ function TransferPlanner({ team_id, initialGameweek }) {
     undoTransfer();
   };
 
+  const subPlayers = (playerKey1, playerKey2) => {
+    console.log(playerKey1);
+    console.log(playerKey2);
+    const newPlayers = [...playersCopy];
+    console.log(newPlayers[playerKey1]);
+    console.log(newPlayers[playerKey2]);
+    const tempPlayer = {
+      id: newPlayers[playerKey1].id,
+      pos: newPlayers[playerKey2].pos,
+      cpt: newPlayers[playerKey1].cpt,
+      vcpt: newPlayers[playerKey1].vcpt,
+    };
+    newPlayers[playerKey1] = {
+      id: newPlayers[playerKey2].id,
+      pos: newPlayers[playerKey1].pos,
+      cpt: newPlayers[playerKey2].cpt,
+      vcpt: newPlayers[playerKey2].vcpt,
+    };
+    newPlayers[playerKey2] = tempPlayer;
+    console.log(newPlayers);
+    setPlayersCopy(newPlayers);
+  };
+
   const makeTransfer = (actualID, initialActualID) => {
     if (actualID === initialActualID) {
       setAvailableTransfers(availableTransfers - 1);
@@ -347,7 +373,6 @@ function TransferPlanner({ team_id, initialGameweek }) {
           <h4>{bankValue.toFixed(1)} $</h4>
           <h4>Cost: {costOfTransfers}</h4>
           <h4>Available Transfers: {availableTransfers}</h4>
-          <h4>Role: {role}</h4>
           <div className="gameweek">
             <BsArrowLeftSquareFill
               className="left-arrow-btn"
@@ -365,6 +390,7 @@ function TransferPlanner({ team_id, initialGameweek }) {
             removePlayer={removePlayer}
             revertPlayer={revertPlayer}
             playersToRevert={playersToRevert}
+            subPlayers={subPlayers}
           />
 
           {/* <ModalTF /> */}
