@@ -150,9 +150,6 @@ function TransferPlanner({ team_id, initialGameweek }) {
       alert(
         "Wrong Positions of Player!\nRequired Playes Roles:\nGoalkeepers: 1\nDefenders: 5\nMidfielders: 5\nForwards: 3"
       );
-      console.log("players");
-      console.log(players);
-      // setPlayersCopy(players);
       setBankValue(bankValueCopy);
       setCostOfTransfers(0);
       setAvailableTransfers(1);
@@ -161,15 +158,19 @@ function TransferPlanner({ team_id, initialGameweek }) {
     return false;
   };
 
-  const firstElevenPlayersSort = (playersCopy, response, countRoles) => {
-    const flag = checkPlayerRoles(countRoles);
-    if (flag) {
+  const validate = (
+    playersCopy,
+    response,
+    countRoles,
+    countFirstElevenRoles
+  ) => {
+    const allPlayersRoles = checkPlayerRoles(countRoles);
+    const firstElevenPlayersRoles = firstElevenFormationValidation(
+      countFirstElevenRoles
+    );
+    if (allPlayersRoles || firstElevenPlayersRoles) {
       playersCopy = players;
     }
-    console.log("players in sort");
-    console.log(players);
-    console.log("playersCopy in sort");
-    console.log(playersCopy);
     const sortedEleven = playersCopy
       .filter((player) => player.pos < 12)
       .sort((a, b) => {
@@ -183,14 +184,34 @@ function TransferPlanner({ team_id, initialGameweek }) {
     setPlayersCopy(newPlayersArray);
   };
 
+  const firstElevenFormationValidation = (dict) => {
+    console.log(dict);
+    if (
+      dict[1] !== 1 ||
+      dict[2] > 5 ||
+      dict[2] < 3 ||
+      dict[3] > 5 ||
+      dict[3] < 2 ||
+      dict[4] > 3 ||
+      !dict[4]
+    ) {
+      alert(
+        "Wrong Formation of First Eleven!\nRequired First Eleven Roles:\nGoalkeepers: 1\nDefenders: 3-5\nMidfielders: 3-5\nForwards: 1-3"
+      );
+      setBankValue(bankValueCopy);
+      setCostOfTransfers(0);
+      setAvailableTransfers(1);
+      return true;
+    }
+    return false;
+  };
   const validationCheck = (bank_value, playersCopy) => {
-    console.log("playersCopy in validationCheck");
-    console.log(playersCopy);
     const getRole = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/api/players`);
 
         const playerRoles = [];
+        const playerFirstElevenRoles = [];
 
         playersCopy
           .map((player) => {
@@ -209,7 +230,30 @@ function TransferPlanner({ team_id, initialGameweek }) {
           return counts;
         }, {});
 
-        firstElevenPlayersSort(playersCopy, response, countRoles);
+        playersCopy
+          .filter((player) => player.pos < 12)
+          .map((player) => {
+            return player.id;
+          })
+          .forEach((playerCopyID) => {
+            playerFirstElevenRoles.push(
+              response.data[playerCopyID - 1].position
+            );
+          });
+
+        const countFirstElevenRoles = playerFirstElevenRoles.reduce(
+          (counts, num) => {
+            if (num in counts) {
+              counts[num]++;
+            } else {
+              counts[num] = 1;
+            }
+            return counts;
+          },
+          {}
+        );
+
+        validate(playersCopy, response, countRoles, countFirstElevenRoles);
       } catch (e) {
         console.log(e.message);
       }
@@ -225,22 +269,6 @@ function TransferPlanner({ team_id, initialGameweek }) {
       setAvailableTransfers(1);
     }
   };
-  // useEffect(() => {
-  //   const getRole = async () => {
-  //     try {
-  //       const response = await axios.get(
-  //         `http://localhost:8000/api/player/${playersCopy[5].id}`
-  //       );
-  //       setRole([...role, response.data["position"]]);
-  //       console.log(role);
-  //     } catch (e) {
-  //       console.log(e.message);
-  //     }
-  //   };
-  //   if (!isLoading) {
-  //     getRole();
-  //   }
-  // }, []);
 
   const addPlayer = (playerID, playerPosition) => {
     const isPlayerInTeam = playersCopy.find((player) => player.id === playerID);
@@ -313,11 +341,7 @@ function TransferPlanner({ team_id, initialGameweek }) {
   };
 
   const subPlayers = (playerKey1, playerKey2) => {
-    console.log(playerKey1);
-    console.log(playerKey2);
     const newPlayers = [...playersCopy];
-    console.log(newPlayers[playerKey1]);
-    console.log(newPlayers[playerKey2]);
     const tempPlayer = {
       id: newPlayers[playerKey1].id,
       pos: newPlayers[playerKey2].pos,
@@ -331,7 +355,6 @@ function TransferPlanner({ team_id, initialGameweek }) {
       vcpt: newPlayers[playerKey2].vcpt,
     };
     newPlayers[playerKey2] = tempPlayer;
-    console.log(newPlayers);
     setPlayersCopy(newPlayers);
   };
 
@@ -353,7 +376,6 @@ function TransferPlanner({ team_id, initialGameweek }) {
 
   const handleGameweekBackward = () => {
     if (gameweekCounter > initialGameweek) {
-      console.log(playersCopy);
       setGameweekCounter(gameweekCounter - 1);
     }
   };

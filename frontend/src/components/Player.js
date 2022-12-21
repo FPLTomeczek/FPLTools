@@ -158,13 +158,10 @@ function Player({
   };
 
   const handleSubOff = (playerKey) => {
-    console.log(playerKey);
     setSubOffID(playerKey);
   };
 
   const handleSubOn = (subOffID, playerKey) => {
-    console.log(subOffID);
-    console.log(playerKey);
     if (subOffID !== 0) {
       subPlayers(subOffID, playerKey);
       setSubOffID(0);
