@@ -37,7 +37,7 @@ class ListPlayersView(APIView):
 class ListUserFPLPicksView(APIView):
     serializer_class = UserFplPicksSerializer
     queryset = UserFplPicks.objects.all()
-    # saveUserFPLPicks(1)
+
 
     def get(self, request, format=None):
         picks = UserFplPicks.objects.all()

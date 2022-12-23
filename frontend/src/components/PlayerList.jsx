@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
+import FilterByTeam from "./FilterByTeam";
 
-function PlayerList({ teamCode }) {
-  // basic fetch
-
-  // fetch('https://api.github.com/users/eunit99/repos')
-  //   .then(response => response.json())
-  //   .then(data => console.log(data));
+function PlayerList({ addPlayer }) {
+  const [selected, setSelected] = useState("");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -21,7 +18,12 @@ function PlayerList({ teamCode }) {
     { label: "Assists", accessor: "assists" },
     { label: "Points", accessor: "total_points" },
     { label: "Team", accessor: "team_code" },
+    { label: "Price", accessor: "price" },
   ];
+
+  const handleAddingPlayer = (playerId, playerPosition) => {
+    addPlayer(playerId, playerPosition);
+  };
 
   useEffect(() => {
     const getData = async () => {
@@ -29,7 +31,6 @@ function PlayerList({ teamCode }) {
         const response = await axios.get(`http://localhost:8000/api/players`);
         setData(response.data);
         setError(null);
-        console.log(data);
       } catch (err) {
         setError(err.message);
         setData(null);
@@ -39,7 +40,6 @@ function PlayerList({ teamCode }) {
     };
     getData();
   }, [loading]);
-
   const handleSorting = (sortField, sortOrder) => {
     if (sortField) {
       const sorted = [...data].sort((a, b) => {
@@ -62,13 +62,23 @@ function PlayerList({ teamCode }) {
   };
 
   return (
-    <div className="PlayerList">
-      <input
-        type="text"
-        value={filterStr}
-        onChange={(e) => setFilterStr(e.target.value)}
-      ></input>
-      <div className="PlayerListTable">
+    <div className="playerList">
+      <div className="filters">
+        <div className="select-team">
+          <h4>Select Team: </h4>
+          <FilterByTeam selected={selected} setSelected={setSelected} />
+        </div>
+        <div className="player-name">
+          <h4>Player name </h4>
+          <input
+            type="text"
+            value={filterStr}
+            placeholder="Enter player name"
+            onChange={(e) => setFilterStr(e.target.value)}
+          ></input>
+        </div>
+      </div>
+      <div className="playerListTable">
         <table>
           <thead>
             <tr>
@@ -91,17 +101,20 @@ function PlayerList({ teamCode }) {
               })}
             </tr>
           </thead>
-          {teamCode ? (
+          {selected ? (
             <tbody>
               {data &&
                 !filterStr &&
                 data
                   .filter((player) => {
-                    return player.team_code === teamCode;
+                    return player.team_code === selected;
                   })
                   .map((val) => {
                     return (
-                      <tr key={val.id}>
+                      <tr
+                        key={val.id}
+                        onClick={() => handleAddingPlayer(val.id, val.position)}
+                      >
                         {columns.map(({ accessor }) => {
                           const tData = val[accessor] ? val[accessor] : "0";
                           return <td key={accessor}>{tData}</td>;
@@ -114,7 +127,7 @@ function PlayerList({ teamCode }) {
                 data
                   .filter((player) => {
                     return (
-                      player.team_code === teamCode &&
+                      player.team_code === selected &&
                       player.web_name
                         .toLowerCase()
                         .includes(filterStr.toLowerCase())
@@ -122,7 +135,10 @@ function PlayerList({ teamCode }) {
                   })
                   .map((val) => {
                     return (
-                      <tr key={val.id}>
+                      <tr
+                        key={val.id}
+                        onClick={() => handleAddingPlayer(val.id, val.position)}
+                      >
                         {columns.map(({ accessor }) => {
                           const tData = val[accessor] ? val[accessor] : "0";
                           return <td key={accessor}>{tData}</td>;
@@ -137,7 +153,10 @@ function PlayerList({ teamCode }) {
                 !filterStr &&
                 data.map((val) => {
                   return (
-                    <tr key={val.id}>
+                    <tr
+                      key={val.id}
+                      onClick={() => handleAddingPlayer(val.id, val.position)}
+                    >
                       {columns.map(({ accessor }) => {
                         const tData = val[accessor] ? val[accessor] : "0";
                         return <td key={accessor}>{tData}</td>;
@@ -155,7 +174,10 @@ function PlayerList({ teamCode }) {
                   )
                   .map((val) => {
                     return (
-                      <tr key={val.id}>
+                      <tr
+                        key={val.id}
+                        onClick={() => handleAddingPlayer(val.id, val.position)}
+                      >
                         {columns.map(({ accessor }) => {
                           const tData = val[accessor] ? val[accessor] : "0";
                           return <td key={accessor}>{tData}</td>;

@@ -14,11 +14,11 @@ class Player(models.Model):
     team_code = models.CharField(max_length=30)
     total_points = models.IntegerField()
     position = models.IntegerField(null=True, validators=[MinValueValidator(1), MaxValueValidator(4)])
-    price = models.IntegerField(null=True, validators=[MaxValueValidator(200)])
+    price = models.FloatField(null=True, validators=[MaxValueValidator(200)])
 
 class UserFplPicks(models.Model):
-    team_value = models.IntegerField(default=0)
-    bank_value = models.IntegerField(default=0)
+    team_value = models.FloatField(default=0)
+    bank_value = models.FloatField(default=0)
     p1 = models.ForeignKey(Player, null=True, on_delete=models.SET_NULL, related_name='pick1')
     p1_pos = models.IntegerField()
     p1_cpt = models.BooleanField()
