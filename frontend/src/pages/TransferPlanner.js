@@ -176,7 +176,7 @@ function TransferPlanner({ team_id, initialGameweek }) {
       countFirstElevenRoles
     );
     if (allPlayersRoles || firstElevenPlayersRoles) {
-      playersCopy = players;
+      playersCopy = playersForAllGWs[gameweekCounter - 16].players;
     }
     const sortedEleven = playersCopy
       .filter((player) => player.pos < 12)
@@ -190,6 +190,23 @@ function TransferPlanner({ team_id, initialGameweek }) {
 
     setPlayersCopy(newPlayersArray);
     setRevertPlayersArr(newPlayersArray);
+
+    const playersForAllGWsCopy = [...playersForAllGWs];
+    playersForAllGWsCopy[gameweekCounter - 16] = {
+      ...playersForAllGWsCopy[gameweekCounter - 16],
+      players: playersCopy,
+    };
+
+    const nextGWobjects = [];
+    for (let i = gameweekCounter + 1; i <= 38; i++) {
+      let obj = { gw: i, players: playersCopy };
+      nextGWobjects.push(obj);
+    }
+
+    const finishedGWs = playersForAllGWsCopy.slice(0, gameweekCounter - 16 + 1);
+
+    const allGWs = finishedGWs.concat(nextGWobjects);
+    setPlayersForAllGWs(allGWs);
   };
 
   const firstElevenFormationValidation = (dict) => {
@@ -275,30 +292,6 @@ function TransferPlanner({ team_id, initialGameweek }) {
       setCostOfTransfers(0);
       setAvailableTransfers(1);
     }
-
-    const playersForAllGWsCopy = [...playersForAllGWs];
-
-    console.log("playersForAllGWsCopy");
-    console.log(playersForAllGWsCopy);
-    playersForAllGWsCopy[gameweekCounter - 16] = {
-      ...playersForAllGWsCopy[gameweekCounter - 16],
-      players: playersCopy,
-    };
-
-    const nextGWobjects = [];
-    for (let i = gameweekCounter + 1; i <= 38; i++) {
-      let obj = { gw: i, players: playersCopy };
-      nextGWobjects.push(obj);
-    }
-    console.log("nextGWobjects");
-    console.log(nextGWobjects);
-
-    const finishedGWs = playersForAllGWsCopy.slice(0, gameweekCounter - 16 + 1);
-    console.log("finishedGWs");
-    console.log(finishedGWs);
-
-    const allGWs = finishedGWs.concat(nextGWobjects);
-    setPlayersForAllGWs(allGWs);
   };
 
   const addPlayer = (playerID, playerPosition) => {
@@ -348,7 +341,6 @@ function TransferPlanner({ team_id, initialGameweek }) {
   };
 
   const revertPlayer = (id) => {
-    console.log(revertPlayersArr);
     const newPlayers = [...playersCopy];
     const playerID = revertPlayersArr[id].id;
     const getPrice = async () => {
@@ -436,8 +428,6 @@ function TransferPlanner({ team_id, initialGameweek }) {
     const nextGWPlayers = playersForAllGWs.filter(
       (gameweek) => gameweek.gw === gameweekCounter + 1
     );
-    console.log("nextGWPlayers");
-    console.log(nextGWPlayers);
     getPlayersSortedAndSetGW(nextGWPlayers);
   };
 
@@ -445,8 +435,6 @@ function TransferPlanner({ team_id, initialGameweek }) {
     const prevGWPlayers = playersForAllGWs.filter(
       (gameweek) => gameweek.gw === gameweekCounter - 1
     );
-    console.log("prevGWPlayers");
-    console.log(prevGWPlayers);
     getPlayersSortedAndSetGW(prevGWPlayers);
   };
 
@@ -500,10 +488,6 @@ function TransferPlanner({ team_id, initialGameweek }) {
   );
 
   function getPlayersSortedAndSetGW(GWPlayers) {
-    console.log("GWPlayers");
-    console.log(GWPlayers);
-    console.log("playersForAllGWs");
-    console.log(playersForAllGWs);
     const getSorted = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/api/players`);
@@ -517,8 +501,6 @@ function TransferPlanner({ team_id, initialGameweek }) {
           });
         const playersCopyBench = GWPlayers[0].players.slice(11, 15);
         const newPlayersArray = [...sortedEleven, ...playersCopyBench];
-        console.log("newPlayersArray");
-        console.log(newPlayersArray);
         setPlayersCopy(newPlayersArray);
       } catch (e) {
         console.log(e.message);
