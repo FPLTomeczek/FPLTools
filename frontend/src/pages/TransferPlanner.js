@@ -17,7 +17,6 @@ function TransferPlanner({ team_id, initialGameweek }) {
   const [costOfTransfers, setCostOfTransfers] = useState(0);
   const [playersToRevert, setPlayersToRevert] = useState([]);
   const [gameweekCounter, setGameweekCounter] = useState(initialGameweek);
-  const [role, setRole] = useState([]);
   const [players, setPlayers] = useState(
     Array(15).fill({
       id: null,
@@ -26,12 +25,15 @@ function TransferPlanner({ team_id, initialGameweek }) {
       vcpt: false,
     })
   );
+  const [playersForAllGWs, setPlayersForAllGWs] = useState([]);
   const [playersCopy, setPlayersCopy] = useState(players);
   const [isLoading, setIsLoading] = useState(false);
+  const [revertPlayersArr, setRevertPlayersArr] = useState([]);
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     const getData = async () => {
+      console.log("useEffect");
       setIsLoading(true);
       try {
         const response = await axios.get(
@@ -136,6 +138,11 @@ function TransferPlanner({ team_id, initialGameweek }) {
         setPlayers(players);
         setPlayersCopy(players);
         setIsError(false);
+        setRevertPlayersArr(players);
+        for (let i = 16; i <= 38; i++) {
+          let obj = { gw: i, players: players };
+          setPlayersForAllGWs((prevArr) => [...prevArr, obj]);
+        }
       } catch (err) {
         setIsError(true);
       } finally {
@@ -182,10 +189,10 @@ function TransferPlanner({ team_id, initialGameweek }) {
     const newPlayersArray = [...sortedEleven, ...playersCopyBench];
 
     setPlayersCopy(newPlayersArray);
+    setRevertPlayersArr(newPlayersArray);
   };
 
   const firstElevenFormationValidation = (dict) => {
-    console.log(dict);
     if (
       dict[1] !== 1 ||
       dict[2] > 5 ||
@@ -205,7 +212,7 @@ function TransferPlanner({ team_id, initialGameweek }) {
     }
     return false;
   };
-  const validationCheck = (bank_value, playersCopy) => {
+  const validationCheck = (bank_value, playersCopyFN) => {
     const getRole = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/api/players`);
@@ -213,7 +220,7 @@ function TransferPlanner({ team_id, initialGameweek }) {
         const playerRoles = [];
         const playerFirstElevenRoles = [];
 
-        playersCopy
+        playersCopyFN
           .map((player) => {
             return player.id;
           })
@@ -230,7 +237,7 @@ function TransferPlanner({ team_id, initialGameweek }) {
           return counts;
         }, {});
 
-        playersCopy
+        playersCopyFN
           .filter((player) => player.pos < 12)
           .map((player) => {
             return player.id;
@@ -253,7 +260,7 @@ function TransferPlanner({ team_id, initialGameweek }) {
           {}
         );
 
-        validate(playersCopy, response, countRoles, countFirstElevenRoles);
+        validate(playersCopyFN, response, countRoles, countFirstElevenRoles);
       } catch (e) {
         console.log(e.message);
       }
@@ -268,6 +275,30 @@ function TransferPlanner({ team_id, initialGameweek }) {
       setCostOfTransfers(0);
       setAvailableTransfers(1);
     }
+
+    const playersForAllGWsCopy = [...playersForAllGWs];
+
+    console.log("playersForAllGWsCopy");
+    console.log(playersForAllGWsCopy);
+    playersForAllGWsCopy[gameweekCounter - 16] = {
+      ...playersForAllGWsCopy[gameweekCounter - 16],
+      players: playersCopy,
+    };
+
+    const nextGWobjects = [];
+    for (let i = gameweekCounter + 1; i <= 38; i++) {
+      let obj = { gw: i, players: playersCopy };
+      nextGWobjects.push(obj);
+    }
+    console.log("nextGWobjects");
+    console.log(nextGWobjects);
+
+    const finishedGWs = playersForAllGWsCopy.slice(0, gameweekCounter - 16 + 1);
+    console.log("finishedGWs");
+    console.log(finishedGWs);
+
+    const allGWs = finishedGWs.concat(nextGWobjects);
+    setPlayersForAllGWs(allGWs);
   };
 
   const addPlayer = (playerID, playerPosition) => {
@@ -317,8 +348,9 @@ function TransferPlanner({ team_id, initialGameweek }) {
   };
 
   const revertPlayer = (id) => {
+    console.log(revertPlayersArr);
     const newPlayers = [...playersCopy];
-    const playerID = players[id].id;
+    const playerID = revertPlayersArr[id].id;
     const getPrice = async () => {
       try {
         const response = await axios.get(
@@ -330,7 +362,12 @@ function TransferPlanner({ team_id, initialGameweek }) {
       }
     };
     getPrice();
-    newPlayers[id] = { id: playerID };
+    newPlayers[id] = {
+      id: playerID,
+      pos: revertPlayersArr[id].pos,
+      cpt: revertPlayersArr[id].cpt,
+      vcpt: revertPlayersArr[id].vcpt,
+    };
     setPlayersCopy(newPlayers);
     setBlankPlayersArrayKey(blankPlayersArrayKey.slice(0, -1));
     const newPlayersToRevert = playersToRevert.filter(
@@ -356,6 +393,10 @@ function TransferPlanner({ team_id, initialGameweek }) {
     };
     newPlayers[playerKey2] = tempPlayer;
     setPlayersCopy(newPlayers);
+    const revertPlayersArrCopy = [...revertPlayersArr];
+    revertPlayersArrCopy[playerKey1] = newPlayers[playerKey1];
+    revertPlayersArrCopy[playerKey2] = newPlayers[playerKey2];
+    setRevertPlayersArr(revertPlayersArrCopy);
   };
 
   const makeTransfer = (actualID, initialActualID) => {
@@ -363,6 +404,7 @@ function TransferPlanner({ team_id, initialGameweek }) {
       setAvailableTransfers(availableTransfers - 1);
       if (availableTransfers <= 0) {
         setCostOfTransfers(costOfTransfers - 4);
+        setAvailableTransfers(0);
       }
     }
   };
@@ -377,11 +419,35 @@ function TransferPlanner({ team_id, initialGameweek }) {
   const handleGameweekBackward = () => {
     if (gameweekCounter > initialGameweek) {
       setGameweekCounter(gameweekCounter - 1);
+      playersForPrevGw();
+      setAvailableTransfers(availableTransfers - 1);
     }
   };
 
   const handleGameweekForward = () => {
-    setGameweekCounter(gameweekCounter + 1);
+    if (gameweekCounter < 38) {
+      setGameweekCounter(gameweekCounter + 1);
+      playersForNextGw();
+      setAvailableTransfers(availableTransfers + 1);
+    }
+  };
+
+  const playersForNextGw = () => {
+    const nextGWPlayers = playersForAllGWs.filter(
+      (gameweek) => gameweek.gw === gameweekCounter + 1
+    );
+    console.log("nextGWPlayers");
+    console.log(nextGWPlayers);
+    getPlayersSortedAndSetGW(nextGWPlayers);
+  };
+
+  const playersForPrevGw = () => {
+    const prevGWPlayers = playersForAllGWs.filter(
+      (gameweek) => gameweek.gw === gameweekCounter - 1
+    );
+    console.log("prevGWPlayers");
+    console.log(prevGWPlayers);
+    getPlayersSortedAndSetGW(prevGWPlayers);
   };
 
   return (
@@ -393,7 +459,7 @@ function TransferPlanner({ team_id, initialGameweek }) {
           <h2>{team_id}</h2>
           <h4>{teamValue} $</h4>
           <h4>{bankValue.toFixed(1)} $</h4>
-          <h4>Cost: {costOfTransfers}</h4>
+          <h4>Cost: {costOfTransfers > 0 ? 0 : costOfTransfers}</h4>
           <h4>Available Transfers: {availableTransfers}</h4>
           <div className="gameweek">
             <BsArrowLeftSquareFill
@@ -432,6 +498,34 @@ function TransferPlanner({ team_id, initialGameweek }) {
       )}
     </>
   );
+
+  function getPlayersSortedAndSetGW(GWPlayers) {
+    console.log("GWPlayers");
+    console.log(GWPlayers);
+    console.log("playersForAllGWs");
+    console.log(playersForAllGWs);
+    const getSorted = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/api/players`);
+        const sortedEleven = GWPlayers[0].players
+          .filter((player) => player.pos < 12)
+          .sort((a, b) => {
+            return (
+              response.data[a.id - 1].position -
+              response.data[b.id - 1].position
+            );
+          });
+        const playersCopyBench = GWPlayers[0].players.slice(11, 15);
+        const newPlayersArray = [...sortedEleven, ...playersCopyBench];
+        console.log("newPlayersArray");
+        console.log(newPlayersArray);
+        setPlayersCopy(newPlayersArray);
+      } catch (e) {
+        console.log(e.message);
+      }
+    };
+    getSorted();
+  }
 }
 
 export default TransferPlanner;

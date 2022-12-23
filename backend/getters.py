@@ -30,5 +30,3 @@ def getTeamBankValue(id, curr_week):
     value = my_team_data['value']/10
     bank = my_team_data['bank']/10
     return value, bank
-
-getPlayer(19)

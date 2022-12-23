@@ -81,14 +81,14 @@
 
 .select-team {
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
   align-items: center;
   margin-left: 10px;
   height: 40px;
 }
 .player-name {
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
   align-items: center;
   margin-left: 10px;
   height: 40px;
