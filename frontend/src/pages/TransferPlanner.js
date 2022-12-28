@@ -13,7 +13,7 @@ function TransferPlanner({ team_id, initialGameweek }) {
   const [bankValue, setBankValue] = useState(0);
   const [bankValueCopy, setBankValueCopy] = useState(0);
   const [blankPlayersArrayKey, setBlankPlayersArrayKey] = useState([]);
-  const [availableTransfers, setAvailableTransfers] = useState(1);
+  const [costOfThisGw, setCostOfThisGW] = useState(0);
   const [costOfTransfers, setCostOfTransfers] = useState(0);
   const [playersToRevert, setPlayersToRevert] = useState([]);
   const [gameweekCounter, setGameweekCounter] = useState(initialGameweek);
@@ -24,6 +24,9 @@ function TransferPlanner({ team_id, initialGameweek }) {
       cpt: false,
       vcpt: false,
     })
+  );
+  const [availableTransfersArr, setAvailableTransfersArr] = useState(
+    Array(38 - initialGameweek + 1).fill(1)
   );
   const [playersForAllGWs, setPlayersForAllGWs] = useState([]);
   const [playersCopy, setPlayersCopy] = useState(players);
@@ -158,8 +161,15 @@ function TransferPlanner({ team_id, initialGameweek }) {
         "Wrong Positions of Player!\nRequired Playes Roles:\nGoalkeepers: 1\nDefenders: 5\nMidfielders: 5\nForwards: 3"
       );
       setBankValue(bankValueCopy);
-      setCostOfTransfers(0);
-      setAvailableTransfers(1);
+      return true;
+    }
+    return false;
+  };
+
+  const checkBankValue = (bank_value) => {
+    if (bank_value < 0) {
+      alert("Total Value under 0$");
+      setBankValue(bankValueCopy);
       return true;
     }
     return false;
@@ -169,14 +179,21 @@ function TransferPlanner({ team_id, initialGameweek }) {
     playersCopy,
     response,
     countRoles,
-    countFirstElevenRoles
+    countFirstElevenRoles,
+    bankValue
   ) => {
     const allPlayersRoles = checkPlayerRoles(countRoles);
     const firstElevenPlayersRoles = firstElevenFormationValidation(
       countFirstElevenRoles
     );
-    if (allPlayersRoles || firstElevenPlayersRoles) {
+    const bank_value = checkBankValue(bankValue);
+
+    if (allPlayersRoles || firstElevenPlayersRoles || bank_value) {
       playersCopy = playersForAllGWs[gameweekCounter - 16].players;
+      const availableTransfersArrCopy = [...availableTransfersArr];
+      availableTransfersArrCopy[gameweekCounter - initialGameweek] = 1;
+      setAvailableTransfersArr(availableTransfersArrCopy);
+      setCostOfTransfers(costOfTransfers - costOfThisGw);
     }
     const sortedEleven = playersCopy
       .filter((player) => player.pos < 12)
@@ -223,8 +240,6 @@ function TransferPlanner({ team_id, initialGameweek }) {
         "Wrong Formation of First Eleven!\nRequired First Eleven Roles:\nGoalkeepers: 1\nDefenders: 3-5\nMidfielders: 3-5\nForwards: 1-3"
       );
       setBankValue(bankValueCopy);
-      setCostOfTransfers(0);
-      setAvailableTransfers(1);
       return true;
     }
     return false;
@@ -277,20 +292,19 @@ function TransferPlanner({ team_id, initialGameweek }) {
           {}
         );
 
-        validate(playersCopyFN, response, countRoles, countFirstElevenRoles);
+        validate(
+          playersCopyFN,
+          response,
+          countRoles,
+          countFirstElevenRoles,
+          bank_value
+        );
       } catch (e) {
         console.log(e.message);
       }
     };
     if (!isLoading) {
       getRole();
-    }
-    if (bank_value < 0) {
-      alert("Total Value under 0$");
-      setPlayersCopy(players);
-      setBankValue(bankValueCopy);
-      setCostOfTransfers(0);
-      setAvailableTransfers(1);
     }
   };
 
@@ -331,12 +345,25 @@ function TransferPlanner({ team_id, initialGameweek }) {
     if (playersCopy[playerId].id !== null) {
       const actualID = playersCopy[playerId].id;
       const newPlayers = [...playersCopy];
+      const newPlayersCopy =
+        playersForAllGWs[gameweekCounter - initialGameweek].players;
       newPlayers[playerId] = { id: null, cpt: false, vcpt: false };
       setPlayersCopy(newPlayers);
       setBlankPlayersArrayKey([...blankPlayersArrayKey, playerId]);
       setBankValue(bankValue + price);
       setPlayersToRevert([...playersToRevert, { playerId, actualID }]);
-      makeTransfer(actualID, players[playerId].id);
+      makeTransfer(actualID, newPlayersCopy[playerId].id);
+    }
+  };
+  const makeTransfer = (actualID, initialActualID) => {
+    if (actualID === initialActualID) {
+      const availableTransfersArrCopy = [...availableTransfersArr];
+      availableTransfersArrCopy[gameweekCounter - initialGameweek] += -1;
+      setAvailableTransfersArr(availableTransfersArrCopy);
+      if (availableTransfersArr[gameweekCounter - initialGameweek] <= 0) {
+        setCostOfTransfers(costOfTransfers - 4);
+        setCostOfThisGW(costOfThisGw - 4);
+      }
     }
   };
 
@@ -369,6 +396,16 @@ function TransferPlanner({ team_id, initialGameweek }) {
     undoTransfer();
   };
 
+  const undoTransfer = () => {
+    const availableTransfersArrCopy = [...availableTransfersArr];
+    availableTransfersArrCopy[gameweekCounter - initialGameweek] += 1;
+    setAvailableTransfersArr(availableTransfersArrCopy);
+    if (availableTransfersArr[gameweekCounter - initialGameweek] < 0) {
+      setCostOfTransfers(costOfTransfers + 4);
+      setCostOfThisGW(costOfThisGw + 4);
+    }
+  };
+
   const subPlayers = (playerKey1, playerKey2) => {
     const newPlayers = [...playersCopy];
     const tempPlayer = {
@@ -391,28 +428,10 @@ function TransferPlanner({ team_id, initialGameweek }) {
     setRevertPlayersArr(revertPlayersArrCopy);
   };
 
-  const makeTransfer = (actualID, initialActualID) => {
-    if (actualID === initialActualID) {
-      setAvailableTransfers(availableTransfers - 1);
-      if (availableTransfers <= 0) {
-        setCostOfTransfers(costOfTransfers - 4);
-        setAvailableTransfers(0);
-      }
-    }
-  };
-
-  const undoTransfer = () => {
-    setAvailableTransfers(availableTransfers + 1);
-    if (availableTransfers < 0) {
-      setCostOfTransfers(costOfTransfers + 4);
-    }
-  };
-
   const handleGameweekBackward = () => {
     if (gameweekCounter > initialGameweek) {
       setGameweekCounter(gameweekCounter - 1);
       playersForPrevGw();
-      setAvailableTransfers(availableTransfers - 1);
     }
   };
 
@@ -420,7 +439,6 @@ function TransferPlanner({ team_id, initialGameweek }) {
     if (gameweekCounter < 38) {
       setGameweekCounter(gameweekCounter + 1);
       playersForNextGw();
-      setAvailableTransfers(availableTransfers + 1);
     }
   };
 
@@ -429,6 +447,7 @@ function TransferPlanner({ team_id, initialGameweek }) {
       (gameweek) => gameweek.gw === gameweekCounter + 1
     );
     getPlayersSortedAndSetGW(nextGWPlayers);
+    setCostOfThisGW(0);
   };
 
   const playersForPrevGw = () => {
@@ -436,32 +455,49 @@ function TransferPlanner({ team_id, initialGameweek }) {
       (gameweek) => gameweek.gw === gameweekCounter - 1
     );
     getPlayersSortedAndSetGW(prevGWPlayers);
+    setCostOfThisGW(0);
   };
 
   return (
     <>
-      <h4>{isLoading ? "...Fetching" : "Loaded"}</h4>
       {isLoading || (
-        <div>
-          <h2>TransferPlanner</h2>
-          <h2>{team_id}</h2>
-          <h4>{teamValue} $</h4>
-          <h4>{bankValue.toFixed(1)} $</h4>
-          <h4>Cost: {costOfTransfers > 0 ? 0 : costOfTransfers}</h4>
-          <h4>Available Transfers: {availableTransfers}</h4>
-          <div className="gameweek">
-            <BsArrowLeftSquareFill
-              className="left-arrow-btn"
-              onClick={handleGameweekBackward}
-            />
-            <h3 className="gameweek-text">Gameweek {gameweekCounter}</h3>
-            <BsArrowRightSquareFill
-              className="right-arrow-btn"
-              onClick={handleGameweekForward}
-            />
-          </div>
+        <div className="main">
+          <div className="bank-value-id"></div>
+          <header className="tf-header">
+            <h3>Your Team ID: {team_id}</h3>
+            <div>
+              <h3>Bank Value: {bankValue.toFixed(1)} $</h3>
+            </div>
+            <div className="gameweek">
+              <BsArrowLeftSquareFill
+                className="left-arrow-btn"
+                onClick={handleGameweekBackward}
+              />
+              <h3 className="gameweek-text">Gameweek {gameweekCounter}</h3>
+              <BsArrowRightSquareFill
+                className="right-arrow-btn"
+                onClick={handleGameweekForward}
+              />
+            </div>
+            <h3>
+              Cost:{" "}
+              <span className={`cost ${costOfTransfers < 0 && "cost-red"}`}>
+                {costOfTransfers > 0 ? 0 : costOfTransfers}
+              </span>
+            </h3>
+            <h3>
+              Available Transfers:{" "}
+              <span
+                className={`transfer ${
+                  availableTransfersArr[gameweekCounter - initialGameweek] <
+                    0 && "transfer-red"
+                }`}
+              >
+                {availableTransfersArr[gameweekCounter - initialGameweek]}
+              </span>
+            </h3>
+          </header>
           <Team
-            className="planner"
             playersCopy={playersCopy}
             removePlayer={removePlayer}
             revertPlayer={revertPlayer}

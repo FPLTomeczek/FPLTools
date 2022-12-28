@@ -11,13 +11,15 @@ function Stats() {
 
   return (
     <div className="stats-container">
-      <ClubLogos clubImages={clubImages} setTeamCode={setTeamCode} />
+      <div className="club-logos">
+        <ClubLogos clubImages={clubImages} setTeamCode={setTeamCode} />
+      </div>
       <div className="div-btn">
         <button className="btn" type="button" onClick={() => setTeamCode("")}>
           All Clubs
         </button>
       </div>
-      <PlayerList></PlayerList>
+      <PlayerList teamCode={teamCode}></PlayerList>
     </div>
   );
 }

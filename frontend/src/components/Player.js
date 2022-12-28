@@ -23,6 +23,8 @@ function Player({
   subPlayers,
   subOffID,
   setSubOffID,
+  darkBackground,
+  setDarkBackground,
 }) {
   // get player by ID
   const [name, setName] = useState("");
@@ -122,7 +124,7 @@ function Player({
         case "Newcastle":
           setShirtColor("#333131");
           break;
-        case "Nottingham Forest":
+        case "Forest":
           setShirtColor("#FF3E3E");
           break;
         case "Southampton":
@@ -159,12 +161,14 @@ function Player({
 
   const handleSubOff = (playerKey) => {
     setSubOffID(playerKey);
+    setDarkBackground(true);
   };
 
   const handleSubOn = (subOffID, playerKey) => {
     if (subOffID !== 0) {
       subPlayers(subOffID, playerKey);
       setSubOffID(0);
+      setDarkBackground(false);
     }
   };
 
@@ -173,7 +177,7 @@ function Player({
       {isLoaded && (
         <div>
           <div
-            className="player"
+            className={`${darkBackground && "player-unavailable"} player`}
             id={`player-${playerkey}`}
             style={{ backgroundColor: color }}
           >
@@ -211,7 +215,6 @@ function Player({
               )}
             </div>
             <h4>{name || "Pick Player"}</h4>
-            <h4>{points}</h4>
             <h4>{team}</h4>
           </div>
         </div>

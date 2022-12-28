@@ -10,6 +10,7 @@ function Team({
   subPlayers,
 }) {
   const [subOffID, setSubOffID] = useState(0);
+  const [darkBackground, setDarkBackground] = useState(false);
   return (
     <div>
       {playersCopy.filter((player) => player.id !== null).length > 0 && (
@@ -31,6 +32,8 @@ function Team({
                 subPlayers={subPlayers}
                 subOffID={subOffID}
                 setSubOffID={setSubOffID}
+                darkBackground={darkBackground}
+                setDarkBackground={setDarkBackground}
               />
             );
           })}

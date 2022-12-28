@@ -19,7 +19,7 @@ def setTeamCode(value):
         14 : "Liverpool",
         43 : "Man City",
         4 : "Newcastle",
-        17 : "Nottingham Forest",
+        17 : "Forest",
         20 : "Southampton",
         6 : "Spurs",
         21 : "West Ham",

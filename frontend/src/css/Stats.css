@@ -3,11 +3,11 @@
   justify-content: center;
 }
 .div-btn button {
-  background-color: var(--clr-primary-5);
+  background-color: #0a92b1;
   padding: 0.25rem 0.5rem;
   border-radius: var(--radius);
   text-transform: capitalize;
-  color: var(--clr-white);
+  color: #cecece;
   letter-spacing: var(--spacing);
   border-color: transparent;
   cursor: pointer;
@@ -15,11 +15,10 @@
   margin: 1rem 1rem;
 }
 .btn:hover {
-  filter: brightness(80%);
+  filter: brightness(120%);
 }
 table {
   width: 100%;
-  border: 5px solid black;
 }
 
 td th {
@@ -27,9 +26,7 @@ td th {
   padding: 8px;
 }
 th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  background-color: #04aa6d;
+  background-color: #0a92b1;
   color: white;
   text-align: center;
   cursor: pointer;
@@ -40,11 +37,12 @@ td {
 }
 
 tr:nth-child(even) {
-  background-color: #f2f2f2;
+  background-color: #0d0d0d;
 }
 
 tr:hover {
   background-color: #ddd;
+  color: #0d0d0d;
 }
 
 .photo {
@@ -60,4 +58,29 @@ tr:hover {
 
 .arrow {
   margin-top: 16px;
+}
+
+.player-name input {
+  padding: 0.3rem;
+  border-radius: var(--radius);
+  background-color: #272729;
+  color: #cecece;
+}
+
+select {
+  background-color: transparent;
+  border: 1px solid #cecece;
+  border-radius: var(--radius);
+  color: #cecece;
+  padding: 0 1em 0 0;
+  margin: 0;
+  width: 100%;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: inherit;
+  line-height: inherit;
+}
+
+.club-logos {
+  margin-top: 20px;
 }

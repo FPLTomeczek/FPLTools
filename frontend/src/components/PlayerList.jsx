@@ -3,7 +3,7 @@ import axios from "axios";
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai";
 import FilterByTeam from "./FilterByTeam";
 
-function PlayerList({ addPlayer }) {
+function PlayerList({ teamCode, addPlayer }) {
   const [selected, setSelected] = useState("");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -101,13 +101,16 @@ function PlayerList({ addPlayer }) {
               })}
             </tr>
           </thead>
-          {selected ? (
+          {selected || teamCode ? (
             <tbody>
               {data &&
                 !filterStr &&
                 data
                   .filter((player) => {
-                    return player.team_code === selected;
+                    return (
+                      player.team_code === selected ||
+                      player.team_code === teamCode
+                    );
                   })
                   .map((val) => {
                     return (
@@ -127,7 +130,8 @@ function PlayerList({ addPlayer }) {
                 data
                   .filter((player) => {
                     return (
-                      player.team_code === selected &&
+                      (player.team_code === selected ||
+                        player.team_code === teamCode) &&
                       player.web_name
                         .toLowerCase()
                         .includes(filterStr.toLowerCase())
