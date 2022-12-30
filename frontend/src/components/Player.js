@@ -8,6 +8,7 @@ import { GrRevert } from "react-icons/gr";
 import { useEffect } from "react";
 import axios from "axios";
 import { IconContext } from "react-icons";
+import switchTeamName from "../switcher";
 
 function Player({
   id,
@@ -25,6 +26,8 @@ function Player({
   setSubOffID,
   darkBackground,
   setDarkBackground,
+  initialGameweek,
+  gameweekCounter,
 }) {
   // get player by ID
   const [name, setName] = useState("");
@@ -35,6 +38,7 @@ function Player({
   const [shirtColor, setShirtColor] = useState("");
   const [position, setPosition] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [futureGameweeks, setFutureGameweeks] = useState([]);
 
   const getData = async (playerID) => {
     try {
@@ -60,6 +64,30 @@ function Player({
   useEffect(() => {
     getData(id);
   }, [id]);
+
+  useEffect(() => {
+    const getNext5GW = async (teamName) => {
+      try {
+        const gameweeks = await axios.get(
+          `http://localhost:8000/api/gameweeks`
+        );
+        // filter by initialGameweek
+        const filteredGameweeks = gameweeks.data
+          .filter(
+            (gw) =>
+              gw.event < gameweekCounter + 6 &&
+              gw.event > gameweekCounter &&
+              (gw.team_a === teamName || gw.team_h === teamName)
+          )
+          .sort((a, b) => a.event - b.event);
+        console.log(filteredGameweeks);
+        setFutureGameweeks(filteredGameweeks);
+      } catch (err) {
+        console.log(err.message);
+      }
+    };
+    getNext5GW(team);
+  }, [team, gameweekCounter]);
 
   useEffect(() => {
     const getStyle = (position) => {
@@ -172,6 +200,25 @@ function Player({
     }
   };
 
+  const styleOfTeamAbbr = (difficulty) => {
+    switch (difficulty) {
+      case 2:
+        return { backgroundColor: "green" };
+      case 3:
+        return { backgroundColor: "white" };
+      case 4:
+        return { backgroundColor: "red" };
+      case 5:
+        return { backgroundColor: "brown" };
+      default:
+        return {};
+    }
+  };
+
+  const calculateDifficulty = (team, gw) => {
+    return team === gw.team_a ? gw.team_a_difficulty : gw.team_h_difficulty;
+  };
+
   return (
     <div>
       {isLoaded && (
@@ -216,6 +263,26 @@ function Player({
             </div>
             <h4>{name || "Pick Player"}</h4>
             <h4>{team}</h4>
+            <div className="future-matches">
+              {futureGameweeks.map((gw, i) => {
+                const difficulty = calculateDifficulty(team, gw);
+                return (
+                  <div className="future-match" key={i}>
+                    <h4>{gw.event}</h4>
+                    <div
+                      className="team-abbr"
+                      style={styleOfTeamAbbr(difficulty)}
+                    >
+                      <h4>
+                        {team === gw.team_a
+                          ? switchTeamName(gw.team_h)
+                          : switchTeamName(gw.team_a).toLowerCase()}
+                      </h4>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}

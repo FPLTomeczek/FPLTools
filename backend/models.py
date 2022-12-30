@@ -16,6 +16,13 @@ class Player(models.Model):
     position = models.IntegerField(null=True, validators=[MinValueValidator(1), MaxValueValidator(4)])
     price = models.FloatField(null=True, validators=[MaxValueValidator(200)])
 
+class Gameweek(models.Model):
+    event = models.IntegerField()
+    team_a = models.CharField(max_length=30) 
+    team_h = models.CharField(max_length=30) 
+    team_a_difficulty = models.IntegerField()
+    team_h_difficulty = models.IntegerField()
+
 class UserFplPicks(models.Model):
     team_value = models.FloatField(default=0)
     bank_value = models.FloatField(default=0)

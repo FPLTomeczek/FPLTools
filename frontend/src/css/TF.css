@@ -62,7 +62,11 @@ body {
 .sub-on {
   cursor: pointer;
 }
-
+.future-matches {
+  font-size: 0.6rem;
+  display: flex;
+  justify-content: center;
+}
 .gameweek {
   display: flex;
   justify-content: center;

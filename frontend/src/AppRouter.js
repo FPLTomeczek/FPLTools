@@ -8,7 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function AppRouter() {
   const [id, setId] = useState(0);
-  const initialGameweek = 16;
+  const initialGameweek = 17;
   return (
     <BrowserRouter>
       <Navbar />

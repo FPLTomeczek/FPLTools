@@ -1,5 +1,5 @@
-from django.urls import path, include
-from .views import DeletePlayersView, DeleteUserFPLPicksView, PlayerDetailView, ListUserFPLPicksView, UserFPLPicksDetailView, ListPlayersView
+from django.urls import path
+from .views import DeletePlayersView, DeleteUserFPLPicksView, PlayerDetailView, ListUserFPLPicksView, UserFPLPicksDetailView, ListPlayersView, ListGameweeksView, DeleteGameweeksView
 urlpatterns = [
     path('players', ListPlayersView.as_view()),
     path('delete-players', DeletePlayersView.as_view({'delete':'delete_all'})),
@@ -7,4 +7,6 @@ urlpatterns = [
     path('player/<int:pk>', PlayerDetailView.as_view()),
     path('users-picks', ListUserFPLPicksView.as_view()),
     path('user-picks/<int:pk>', UserFPLPicksDetailView.as_view()),
+    path('gameweeks', ListGameweeksView.as_view()),
+    path('delete-gameweeks', DeleteGameweeksView.as_view({'delete':'delete_all'}))
 ]

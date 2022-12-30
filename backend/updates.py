@@ -1,5 +1,5 @@
-from .getters import getPlayers, getFPLTeamByID, getTeamBankValue
-from .models import Player, UserFplPicks
+from .getters import getPlayers, getFPLTeamByID, getTeamBankValue, getAllFixtures
+from .models import Player, UserFplPicks, Gameweek
 from django.core.exceptions import ObjectDoesNotExist
 
 def setTeamCode(value):
@@ -27,6 +27,31 @@ def setTeamCode(value):
     }
     return switcher.get(value, 'No Club')
 
+def setTeamCodeGameweeks(value):
+    switcher = {
+        1 : "Arsenal",
+        2 : "Aston Villa",
+        3 : "Bournemouth",
+        4 : "Brentford",
+        5 : "Brighton",
+        6 : "Chelsea",
+        7 : "Crystal Palace",
+        8 : "Everton",
+        9 : "Fulham",
+        10 : "Leicester",
+        11 : "Leeds",
+        12 : "Liverpool",
+        13 : "Man City",
+        14 : "Man United",
+        15 : "Newcastle",
+        16 : "Forest",
+        17 : "Southampton",
+        18 : "Spurs",
+        19 : "West Ham",
+        20 : "Wolverhampton"
+    }
+    return switcher.get(value, 'No Club')
+
 def savePlayers():
     queryset = getPlayers()
     for player in queryset:
@@ -44,9 +69,25 @@ def savePlayers():
             p = Player(id=id, web_name = name, goals_scored = goals, assists = assists, team_code = team_code, total_points = points, position = position, price = price)
             p.save()
 
+def saveGameweeks():
+    queryset = getAllFixtures()
+    for gameweek in queryset:
+        try:
+            gw = Gameweek.objects.get(id = gameweek['code'])
+        except ObjectDoesNotExist:
+            id = gameweek['code']
+            event = gameweek['event']
+            team_a = setTeamCodeGameweeks(gameweek['team_a'])
+            team_h = setTeamCodeGameweeks(gameweek['team_h'])
+            team_a_difficulty = gameweek['team_a_difficulty']
+            team_h_difficulty = gameweek['team_h_difficulty']
+            gw = Gameweek(id=id, event = event, team_a = team_a, team_h = team_h, team_a_difficulty = team_a_difficulty, team_h_difficulty = team_h_difficulty)
+            gw.save()
+
+
 def saveUserFPLPicks(id):
-        queryset = getFPLTeamByID(id, 16)
-        team_value, bank_value = getTeamBankValue(id, 16)
+        queryset = getFPLTeamByID(id, 17)
+        team_value, bank_value = getTeamBankValue(id, 17)
         try:
             user_picks = UserFplPicks.objects.get(id = id)
         except ObjectDoesNotExist:

@@ -503,6 +503,7 @@ function TransferPlanner({ team_id, initialGameweek }) {
             revertPlayer={revertPlayer}
             playersToRevert={playersToRevert}
             subPlayers={subPlayers}
+            gameweekCounter={gameweekCounter}
           />
 
           {/* <ModalTF /> */}

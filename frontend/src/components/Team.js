@@ -8,6 +8,7 @@ function Team({
   revertPlayer,
   playersToRevert,
   subPlayers,
+  gameweekCounter,
 }) {
   const [subOffID, setSubOffID] = useState(0);
   const [darkBackground, setDarkBackground] = useState(false);
@@ -34,6 +35,7 @@ function Team({
                 setSubOffID={setSubOffID}
                 darkBackground={darkBackground}
                 setDarkBackground={setDarkBackground}
+                gameweekCounter={gameweekCounter}
               />
             );
           })}
