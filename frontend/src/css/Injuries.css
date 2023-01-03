@@ -1,0 +1,19 @@
+.injury-player-info {
+  display: flex;
+}
+.front-list-element {
+  display: flex;
+  align-items: center;
+  border: 3px solid black;
+  width: 500px;
+  justify-content: space-around;
+}
+.all-clubs-injuries {
+  border: 5px solid white;
+  width: 500px;
+}
+.main-injury {
+  border: 5px solid red;
+  display: flex;
+  justify-content: center;
+}

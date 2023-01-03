@@ -136,3 +136,14 @@ body {
   display: flex;
   justify-content: space-around;
 }
+.error-message {
+  display: flex;
+  border-radius: 10px;
+  border: 2px solid red;
+  padding: 10px;
+}
+.error-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}

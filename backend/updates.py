@@ -66,7 +66,9 @@ def savePlayers():
             points = player['total_points']
             position = player['element_type']
             price = player['now_cost']/10
-            p = Player(id=id, web_name = name, goals_scored = goals, assists = assists, team_code = team_code, total_points = points, position = position, price = price)
+            chance_of_playing_next_round = player['chance_of_playing_next_round']
+            news = player['news']
+            p = Player(id=id, web_name = name, goals_scored = goals, assists = assists, team_code = team_code, total_points = points, position = position, price = price, chance_of_playing_next_round = chance_of_playing_next_round, news = news)
             p.save()
 
 def saveGameweeks():

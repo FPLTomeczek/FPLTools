@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import DeletePlayersView, DeleteUserFPLPicksView, PlayerDetailView, ListUserFPLPicksView, UserFPLPicksDetailView, ListPlayersView, ListGameweeksView, DeleteGameweeksView
+from .views import DeletePlayersView, DeleteUserFPLPicksView, PlayerDetailView, ListUserFPLPicksView, UserFPLPicksDetailView,  ListGameweeksView, DeleteGameweeksView, ListPlayersView
 urlpatterns = [
     path('players', ListPlayersView.as_view()),
     path('delete-players', DeletePlayersView.as_view({'delete':'delete_all'})),

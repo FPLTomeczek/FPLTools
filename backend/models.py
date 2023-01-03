@@ -15,6 +15,8 @@ class Player(models.Model):
     total_points = models.IntegerField()
     position = models.IntegerField(null=True, validators=[MinValueValidator(1), MaxValueValidator(4)])
     price = models.FloatField(null=True, validators=[MaxValueValidator(200)])
+    chance_of_playing_next_round = models.IntegerField(null=True)
+    news = models.CharField(max_length=300, null=True)
 
 class Gameweek(models.Model):
     event = models.IntegerField()

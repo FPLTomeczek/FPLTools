@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Player from "../components/Player";
 import "../css/TF.css";
 import PlayerList from "../components/PlayerList";
-import FilterByTeam from "../components/FilterByTeam";
-import ModalTF from "../components/ModalTF";
 import Team from "../components/Team";
 import { BsArrowLeftSquareFill, BsArrowRightSquareFill } from "react-icons/bs";
+import Error from "../components/Error";
 
 function TransferPlanner({ team_id, initialGameweek }) {
   const [teamValue, setTeamValue] = useState(0);
@@ -17,6 +15,12 @@ function TransferPlanner({ team_id, initialGameweek }) {
   const [costOfTransfers, setCostOfTransfers] = useState(0);
   const [playersToRevert, setPlayersToRevert] = useState([]);
   const [gameweekCounter, setGameweekCounter] = useState(initialGameweek);
+
+  /*error */
+  const [errorForSubmit, setErrorForSubmit] = useState(null);
+  const [remainingTime, setRemainingTime] = useState(10000);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [players, setPlayers] = useState(
     Array(15).fill({
       id: null,
@@ -155,11 +159,37 @@ function TransferPlanner({ team_id, initialGameweek }) {
     getData();
   }, [team_id]);
 
+  useEffect(() => {
+    if (errorForSubmit) {
+      const timeoutId = setTimeout(() => {
+        setErrorForSubmit(null);
+      }, remainingTime);
+
+      return () => {
+        clearTimeout(timeoutId);
+      };
+    }
+  }, [errorForSubmit, remainingTime]);
+
+  useEffect(() => {
+    if (errorForSubmit) {
+      const intervalId = setInterval(() => {
+        setRemainingTime((prevTime) => prevTime - 1000);
+      }, 1000);
+
+      return () => {
+        clearInterval(intervalId);
+      };
+    }
+  }, [errorForSubmit]);
+
+  function handleError() {
+    setErrorForSubmit(true);
+    setRemainingTime(10000);
+  }
+
   const checkPlayerRoles = (dict) => {
     if (dict[1] !== 2 || dict[2] !== 5 || dict[3] !== 5 || dict[4] !== 3) {
-      alert(
-        "Wrong Positions of Player!\nRequired Playes Roles:\nGoalkeepers: 1\nDefenders: 5\nMidfielders: 5\nForwards: 3"
-      );
       setBankValue(bankValueCopy);
       return true;
     }
@@ -168,7 +198,6 @@ function TransferPlanner({ team_id, initialGameweek }) {
 
   const checkBankValue = (bank_value) => {
     if (bank_value < 0) {
-      alert("Total Value under 0$");
       setBankValue(bankValueCopy);
       return true;
     }
@@ -187,6 +216,23 @@ function TransferPlanner({ team_id, initialGameweek }) {
       countFirstElevenRoles
     );
     const bank_value = checkBankValue(bankValue);
+
+    if (allPlayersRoles) {
+      handleError();
+      setErrorMessage(
+        "Wrong Positions of Player!\nRequired Players Roles:\nGoalkeepers: 1\nDefenders: 5\nMidfielders: 5\nForwards: 3"
+      );
+    }
+    if (firstElevenPlayersRoles) {
+      handleError();
+      setErrorMessage(
+        "Wrong Formation of First Eleven!\nRequired First Eleven Roles:\nGoalkeepers: 1\nDefenders: 3-5\nMidfielders: 3-5\nForwards: 1-3"
+      );
+    }
+    if (bank_value) {
+      handleError();
+      setErrorMessage("Total Bank Value under 0$");
+    }
 
     if (allPlayersRoles || firstElevenPlayersRoles || bank_value) {
       playersCopy = playersForAllGWs[gameweekCounter - 16].players;
@@ -236,9 +282,6 @@ function TransferPlanner({ team_id, initialGameweek }) {
       dict[4] > 3 ||
       !dict[4]
     ) {
-      alert(
-        "Wrong Formation of First Eleven!\nRequired First Eleven Roles:\nGoalkeepers: 1\nDefenders: 3-5\nMidfielders: 3-5\nForwards: 1-3"
-      );
       setBankValue(bankValueCopy);
       return true;
     }
@@ -291,7 +334,6 @@ function TransferPlanner({ team_id, initialGameweek }) {
           },
           {}
         );
-
         validate(
           playersCopyFN,
           response,
@@ -310,9 +352,7 @@ function TransferPlanner({ team_id, initialGameweek }) {
 
   const addPlayer = (playerID, playerPosition) => {
     const isPlayerInTeam = playersCopy.find((player) => player.id === playerID);
-    if (isPlayerInTeam) {
-      alert("Player already in Team, pick another player");
-    } else {
+    if (!isPlayerInTeam) {
       const newPlayers = [...playersCopy];
       const getData = async () => {
         try {
@@ -497,6 +537,7 @@ function TransferPlanner({ team_id, initialGameweek }) {
               </span>
             </h3>
           </header>
+          {errorForSubmit && <Error message={errorMessage}></Error>}
           <Team
             playersCopy={playersCopy}
             removePlayer={removePlayer}
