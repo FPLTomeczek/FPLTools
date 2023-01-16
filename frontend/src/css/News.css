@@ -1,0 +1,17 @@
+.tweets-container {
+  display: flex;
+  margin-top: 40px;
+  flex-direction: row;
+  justify-content: space-around;
+}
+@media (max-width: 1388px) {
+  .tweets-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+.tweets-heading {
+  display: flex;
+  justify-content: center;
+}

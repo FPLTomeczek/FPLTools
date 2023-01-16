@@ -5,10 +5,12 @@ import ClubInjuries from "../components/ClubInjuries";
 
 function Injuries() {
   const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const getPlayers = async () => {
       try {
+        setIsLoading(true);
         const response = await axios.get("http://localhost:8000/api/players");
         setData(
           response.data
@@ -27,6 +29,8 @@ function Injuries() {
         );
       } catch (err) {
         console.log(err.message);
+      } finally {
+        setIsLoading(false);
       }
     };
     getPlayers();
@@ -34,21 +38,26 @@ function Injuries() {
   console.log(data);
 
   return (
-    <div className="main-injury">
-      <div className="all-clubs-injuries">
-        {images.map((image) => {
-          const { img, teamCode } = image;
-          return (
-            <ClubInjuries
-              img={img}
-              teamCode={teamCode}
-              players={data[teamCode]}
-            />
-          );
-        })}
-        ;
-      </div>
-    </div>
+    <>
+      {isLoading || (
+        <div className="main-injury">
+          <div className="all-clubs-injuries">
+            {data &&
+              images.map((image, i) => {
+                const { img, teamCode } = image;
+                return (
+                  <ClubInjuries
+                    img={img}
+                    teamCode={teamCode}
+                    players={data[teamCode]}
+                    key={i}
+                  />
+                );
+              })}
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

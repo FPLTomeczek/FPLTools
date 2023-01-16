@@ -6,7 +6,7 @@ urlpatterns = [
     path('delete-user-picks', DeleteUserFPLPicksView.as_view({'delete':'delete_all'})),
     path('player/<int:pk>', PlayerDetailView.as_view()),
     path('users-picks', ListUserFPLPicksView.as_view()),
-    path('user-picks/<int:pk>', UserFPLPicksDetailView.as_view()),
+    path('users-picks/<int:pk>', UserFPLPicksDetailView.as_view()),
     path('gameweeks', ListGameweeksView.as_view()),
     path('delete-gameweeks', DeleteGameweeksView.as_view({'delete':'delete_all'}))
 ]

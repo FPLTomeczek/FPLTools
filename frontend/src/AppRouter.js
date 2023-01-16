@@ -4,6 +4,7 @@ import Injuries from "./pages/Injuries";
 import EntryPage from "./pages/EntryPage";
 import TransferPlanner from "./pages/TransferPlanner";
 import Navbar from "./components/Navbar";
+import News from "./pages/News";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function AppRouter() {
@@ -22,6 +23,7 @@ function AppRouter() {
           }
         />
         <Route path="/injuries" element={<Injuries />} />
+        <Route path="/news" element={<News />} />
       </Routes>
     </BrowserRouter>
   );

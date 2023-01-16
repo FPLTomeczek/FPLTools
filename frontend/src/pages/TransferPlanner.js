@@ -44,7 +44,7 @@ function TransferPlanner({ team_id, initialGameweek }) {
       setIsLoading(true);
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/user-picks/${team_id}`
+          `http://localhost:8000/api/users-picks/${team_id}`
         );
         const resp = response.data;
         setTeamValue(resp["team_value"]);
@@ -506,7 +506,7 @@ function TransferPlanner({ team_id, initialGameweek }) {
           <header className="tf-header">
             <h3>Your Team ID: {team_id}</h3>
             <div>
-              <h3>Bank Value: {bankValue.toFixed(1)} $</h3>
+              <h3>Bank Value: £ {bankValue.toFixed(1)} </h3>
             </div>
             <div className="gameweek">
               <BsArrowLeftSquareFill
@@ -546,8 +546,6 @@ function TransferPlanner({ team_id, initialGameweek }) {
             subPlayers={subPlayers}
             gameweekCounter={gameweekCounter}
           />
-
-          {/* <ModalTF /> */}
           <div className="submit-button-wrapper">
             <button
               type="button"

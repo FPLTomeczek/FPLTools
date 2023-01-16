@@ -193,9 +193,9 @@ function Player({
   };
 
   const handleSubOn = (subOffID, playerKey) => {
-    if (subOffID !== 0) {
+    if (subOffID !== null) {
       subPlayers(subOffID, playerKey);
-      setSubOffID(0);
+      setSubOffID(null);
       setDarkBackground(false);
     }
   };

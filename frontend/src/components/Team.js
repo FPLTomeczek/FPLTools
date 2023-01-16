@@ -10,7 +10,7 @@ function Team({
   subPlayers,
   gameweekCounter,
 }) {
-  const [subOffID, setSubOffID] = useState(0);
+  const [subOffID, setSubOffID] = useState(null);
   const [darkBackground, setDarkBackground] = useState(false);
   return (
     <div>

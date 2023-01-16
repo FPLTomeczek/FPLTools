@@ -7,8 +7,8 @@ body {
 }
 .planner {
   display: flex;
-  width: auto;
   justify-content: center;
+  flex-wrap: wrap;
 }
 .tf-header {
   display: flex;
@@ -21,7 +21,7 @@ body {
 /* player */
 .player {
   text-align: center;
-  padding: 10px 0px;
+  padding: 5px 0px;
   border-right: 5px solid white;
   color: black;
 }
@@ -35,6 +35,7 @@ body {
 .shirt-btn {
   width: 100px;
   height: auto;
+  cursor: pointer;
   /* color: blue; */
 }
 .player#player-10 {

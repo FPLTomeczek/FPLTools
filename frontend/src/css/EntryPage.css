@@ -1,9 +1,19 @@
+.entry-page-container {
+  height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .form-container {
   display: flex;
   justify-content: center;
-  height: 80vh;
   align-items: center;
   box-sizing: border-box;
+}
+@media (max-width: 620px) {
+  .form-container {
+    flex-direction: column;
+  }
 }
 .btn {
   background-color: #0a92b1;

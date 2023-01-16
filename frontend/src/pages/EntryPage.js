@@ -33,7 +33,7 @@ function EntryPage({ id, setId }) {
   };
 
   return (
-    <>
+    <div className="entry-page-container">
       <form onSubmit={handleSubmit} className="form-container">
         <label htmlFor="id">ID: </label>
         <input
@@ -47,7 +47,7 @@ function EntryPage({ id, setId }) {
           Submit
         </button>
       </form>
-    </>
+    </div>
   );
 }
 
