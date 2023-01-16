@@ -30,3 +30,9 @@ def getTeamBankValue(id, curr_week):
     value = my_team_data['value']/10
     bank = my_team_data['bank']/10
     return value, bank
+
+def getAllFixtures():
+    url = "https://fantasy.premierleague.com/api/fixtures/?future=1"
+    data = requests.get(url).json()
+    return data
+    

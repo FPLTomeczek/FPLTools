@@ -8,8 +8,10 @@ function Team({
   revertPlayer,
   playersToRevert,
   subPlayers,
+  gameweekCounter,
 }) {
-  const [subOffID, setSubOffID] = useState(0);
+  const [subOffID, setSubOffID] = useState(null);
+  const [darkBackground, setDarkBackground] = useState(false);
   return (
     <div>
       {playersCopy.filter((player) => player.id !== null).length > 0 && (
@@ -31,6 +33,9 @@ function Team({
                 subPlayers={subPlayers}
                 subOffID={subOffID}
                 setSubOffID={setSubOffID}
+                darkBackground={darkBackground}
+                setDarkBackground={setDarkBackground}
+                gameweekCounter={gameweekCounter}
               />
             );
           })}

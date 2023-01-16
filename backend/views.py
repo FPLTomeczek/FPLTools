@@ -2,12 +2,12 @@ from django.http import Http404
 from venv import create
 from django.shortcuts import render
 from rest_framework import generics, status, viewsets
-from .serializers import PlayerSerializer, UserFplPicksSerializer
-from .models import Player, UserFplPicks
+from .serializers import PlayerSerializer, UserFplPicksSerializer, GameweekSerializer
+from .models import Player, UserFplPicks, Gameweek
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from .updates import savePlayers, saveUserFPLPicks
+from .updates import savePlayers, saveUserFPLPicks, saveGameweeks
 
 from backend import serializers
 
@@ -33,6 +33,32 @@ class ListPlayersView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ListGameweeksView(APIView):
+    serializer_class = GameweekSerializer
+    queryset = Gameweek.objects.all()
+    saveGameweeks()
+    
+    def get(self, request, format=None):
+        gameweeks = Gameweek.objects.all()
+        serializer = GameweekSerializer(gameweeks, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = GameweekSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class DeleteGameweeksView(viewsets.ModelViewSet):
+    queryset = Gameweek.objects.all()
+    serializer_class = GameweekSerializer
+
+    @action(detail=False, methods=['post'])
+    def delete_all(self, request):
+        Gameweek.objects.all().delete()
+        return Response('success')
 
 class ListUserFPLPicksView(APIView):
     serializer_class = UserFplPicksSerializer

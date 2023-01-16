@@ -61,7 +61,7 @@ const images = [
   },
   {
     img: "./img/nottingham.png",
-    teamCode: "Nottingham Forest",
+    teamCode: "Forest",
   },
   {
     img: "./img/southampton.png",

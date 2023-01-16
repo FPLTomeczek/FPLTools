@@ -1,14 +1,32 @@
+body {
+  background-color: #272729;
+  color: #cecece;
+}
+.main {
+  margin-top: 40px;
+}
 .planner {
   display: flex;
-  width: auto;
   justify-content: center;
+  flex-wrap: wrap;
 }
-
+.tf-header {
+  display: flex;
+  justify-content: space-around;
+}
+.cost-red,
+.transfer-red {
+  color: red;
+}
 /* player */
 .player {
   text-align: center;
-  padding: 10px 0px;
-  border-right: 5px solid black;
+  padding: 5px 0px;
+  border-right: 5px solid white;
+  color: black;
+}
+.player-unavailable {
+  filter: brightness(30%);
 }
 .revert-btn {
   width: 100px;
@@ -17,16 +35,24 @@
 .shirt-btn {
   width: 100px;
   height: auto;
+  cursor: pointer;
   /* color: blue; */
 }
 .player#player-10 {
   margin-right: 50px;
 }
 .player#player-0 {
-  border-left: 5px solid black;
+  border-left: 5px solid white;
 }
 .player#player-11 {
-  border-left: 5px solid black;
+  border-left: 5px solid white;
+}
+
+.player#player-11,
+.player#player-12,
+.player#player-13,
+.player#player-14 {
+  filter: brightness(100%);
 }
 .substitution-button {
   height: 15px;
@@ -37,7 +63,11 @@
 .sub-on {
   cursor: pointer;
 }
-
+.future-matches {
+  font-size: 0.6rem;
+  display: flex;
+  justify-content: center;
+}
 .gameweek {
   display: flex;
   justify-content: center;
@@ -55,16 +85,20 @@
 .submit-button {
   display: flex;
   width: auto;
-  background-color: var(--clr-primary-5);
+  background-color: #0a92b1;
   border-radius: var(--radius);
+  color: #cecece;
   text-transform: capitalize;
-  color: var(--clr-white);
   letter-spacing: var(--spacing);
   border-color: transparent;
   cursor: pointer;
-  font-size: 2.1rem;
-  height: 3rem;
+  font-size: 1.5rem;
   justify-content: center;
+  padding: 5px;
+}
+
+.submit-button:hover {
+  filter: brightness(120%);
 }
 
 .submit-button-wrapper {
@@ -74,7 +108,7 @@
 }
 
 .playerListTable {
-  width: 100%;
+  margin: 8px 20px;
 }
 
 /* filter buttons */
@@ -83,14 +117,14 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  margin-left: 10px;
+  margin-left: 22px;
   height: 40px;
 }
 .player-name {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  margin-left: 10px;
+  margin-left: 22px;
   height: 40px;
 }
 .select-team h4 {
@@ -98,4 +132,19 @@
 }
 .player-name h4 {
   margin-right: 8px;
+}
+.bank-value-id {
+  display: flex;
+  justify-content: space-around;
+}
+.error-message {
+  display: flex;
+  border-radius: 10px;
+  border: 2px solid red;
+  padding: 10px;
+}
+.error-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
 }

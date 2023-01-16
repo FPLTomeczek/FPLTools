@@ -1,0 +1,37 @@
+.injury-player-info {
+  display: flex;
+  margin-top: 10px;
+  justify-content: space-between;
+}
+
+.injury-player-name {
+  margin-right: 10px;
+}
+.error-percentage {
+  margin-left: 10px;
+}
+.error-percentage h4 {
+  margin: 5px 0px;
+}
+/* .injury-player-info h4 {
+  margin-left: 10px;
+} */
+.badge-arrow-container {
+  display: flex;
+  align-items: center;
+  width: 600px;
+  justify-content: space-around;
+  cursor: pointer;
+}
+/* .all-clubs-injuries {
+  border: 5px solid white;
+  width: 500px;
+} */
+
+.main-injury {
+  display: flex;
+  justify-content: center;
+}
+.club-injuries {
+  border-bottom: 4px solid black;
+}

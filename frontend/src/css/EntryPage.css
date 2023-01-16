@@ -1,15 +1,25 @@
+.entry-page-container {
+  height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .form-container {
   display: flex;
   justify-content: center;
-  height: 80vh;
   align-items: center;
   box-sizing: border-box;
 }
+@media (max-width: 620px) {
+  .form-container {
+    flex-direction: column;
+  }
+}
 .btn {
-  background-color: var(--clr-primary-5);
+  background-color: #0a92b1;
   border-radius: var(--radius);
   text-transform: capitalize;
-  color: var(--clr-white);
+  color: #cecece;
   letter-spacing: var(--spacing);
   border-color: transparent;
   cursor: pointer;
@@ -22,6 +32,8 @@
   margin: 0px 10px;
   font-size: 1.8rem;
   height: 2rem;
+  background-color: #272729;
+  color: #cecece;
 }
 
 .form-container label {

@@ -9,7 +9,7 @@ function Navbar() {
         <ul className="nav-list">
           <li>
             <Link className="li-link" to="/">
-              EntryPage
+              Enter ID
             </Link>
           </li>
           <li>
@@ -25,6 +25,11 @@ function Navbar() {
           <li>
             <Link className="li-link" to="/injuries">
               Injuries
+            </Link>
+          </li>
+          <li>
+            <Link className="li-link" to="/news">
+              News
             </Link>
           </li>
         </ul>
