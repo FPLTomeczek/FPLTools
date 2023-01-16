@@ -5,6 +5,7 @@ import PlayerList from "../components/PlayerList";
 import Team from "../components/Team";
 import { BsArrowLeftSquareFill, BsArrowRightSquareFill } from "react-icons/bs";
 import Error from "../components/Error";
+import { RiSoundModuleFill } from "react-icons/ri";
 
 function TransferPlanner({ team_id, initialGameweek }) {
   const [teamValue, setTeamValue] = useState(0);
