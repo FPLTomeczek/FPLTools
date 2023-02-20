@@ -3,19 +3,21 @@ import React from "react";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "../css/EntryPage.css";
+import { useGlobalContext } from "../context";
 
 var qs = require("qs");
 
 function EntryPage({ id, setId }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState("");
-
+  const { updateStartTime } = useGlobalContext();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
+      updateStartTime(Date.now());
       await axios.post(
         "http://localhost:8000/api/users-picks",
         qs.stringify({ id: id })

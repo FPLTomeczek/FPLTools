@@ -5,7 +5,12 @@ import PlayerList from "../components/PlayerList";
 import Team from "../components/Team";
 import { BsArrowLeftSquareFill, BsArrowRightSquareFill } from "react-icons/bs";
 import Error from "../components/Error";
-import { RiSoundModuleFill } from "react-icons/ri";
+import {
+  checkPlayerRoles,
+  checkBankValue,
+  firstElevenFormationValidation,
+} from "../validateFunctions";
+import { useGlobalContext } from "../context";
 
 function TransferPlanner({ team_id, initialGameweek }) {
   const [teamValue, setTeamValue] = useState(0);
@@ -16,6 +21,7 @@ function TransferPlanner({ team_id, initialGameweek }) {
   const [costOfTransfers, setCostOfTransfers] = useState(0);
   const [playersToRevert, setPlayersToRevert] = useState([]);
   const [gameweekCounter, setGameweekCounter] = useState(initialGameweek);
+  const { startTime } = useGlobalContext();
 
   /*error */
   const [errorForSubmit, setErrorForSubmit] = useState(null);
@@ -44,9 +50,12 @@ function TransferPlanner({ team_id, initialGameweek }) {
       console.log("useEffect");
       setIsLoading(true);
       try {
+        const start = Date.now();
         const response = await axios.get(
           `http://localhost:8000/api/users-picks/${team_id}`
         );
+        const finish = Date.now();
+        const time = finish - start;
         const resp = response.data;
         setTeamValue(resp["team_value"]);
         setBankValue(resp["bank_value"]);
@@ -151,6 +160,8 @@ function TransferPlanner({ team_id, initialGameweek }) {
           let obj = { gw: i, players: players };
           setPlayersForAllGWs((prevArr) => [...prevArr, obj]);
         }
+        console.log(time);
+        console.log(`Time between click and load: ${Date.now() - startTime}`);
       } catch (err) {
         setIsError(true);
       } finally {
@@ -189,22 +200,6 @@ function TransferPlanner({ team_id, initialGameweek }) {
     setRemainingTime(10000);
   }
 
-  const checkPlayerRoles = (dict) => {
-    if (dict[1] !== 2 || dict[2] !== 5 || dict[3] !== 5 || dict[4] !== 3) {
-      setBankValue(bankValueCopy);
-      return true;
-    }
-    return false;
-  };
-
-  const checkBankValue = (bank_value) => {
-    if (bank_value < 0) {
-      setBankValue(bankValueCopy);
-      return true;
-    }
-    return false;
-  };
-
   const validate = (
     playersCopy,
     response,
@@ -219,18 +214,21 @@ function TransferPlanner({ team_id, initialGameweek }) {
     const bank_value = checkBankValue(bankValue);
 
     if (allPlayersRoles) {
+      setBankValue(bankValueCopy);
       handleError();
       setErrorMessage(
         "Wrong Positions of Player!\nRequired Players Roles:\nGoalkeepers: 1\nDefenders: 5\nMidfielders: 5\nForwards: 3"
       );
     }
     if (firstElevenPlayersRoles) {
+      setBankValue(bankValueCopy);
       handleError();
       setErrorMessage(
         "Wrong Formation of First Eleven!\nRequired First Eleven Roles:\nGoalkeepers: 1\nDefenders: 3-5\nMidfielders: 3-5\nForwards: 1-3"
       );
     }
     if (bank_value) {
+      setBankValue(bankValueCopy);
       handleError();
       setErrorMessage("Total Bank Value under 0$");
     }
@@ -273,21 +271,6 @@ function TransferPlanner({ team_id, initialGameweek }) {
     setPlayersForAllGWs(allGWs);
   };
 
-  const firstElevenFormationValidation = (dict) => {
-    if (
-      dict[1] !== 1 ||
-      dict[2] > 5 ||
-      dict[2] < 3 ||
-      dict[3] > 5 ||
-      dict[3] < 2 ||
-      dict[4] > 3 ||
-      !dict[4]
-    ) {
-      setBankValue(bankValueCopy);
-      return true;
-    }
-    return false;
-  };
   const validationCheck = (bank_value, playersCopyFN) => {
     const getRole = async () => {
       try {

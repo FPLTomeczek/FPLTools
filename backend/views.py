@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from .updates import savePlayers, saveUserFPLPicks, saveGameweeks
+import time
 
 from backend import serializers
 
@@ -71,12 +72,15 @@ class ListUserFPLPicksView(APIView):
         return Response(serializer.data)
 
     def post(self, request, format=None):
+        start = time.time()
         data = request.data
         print(data)
         print(data['id'])
         if data:
             saveUserFPLPicks(data['id'])
+            print(time.time()-start)
             return Response(data, status=status.HTTP_201_CREATED)
+        
         return Response("fail", status=status.HTTP_400_BAD_REQUEST)
 
 class UserFPLPicksDetailView(APIView):

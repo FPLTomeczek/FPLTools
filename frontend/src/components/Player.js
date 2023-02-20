@@ -80,7 +80,6 @@ function Player({
               (gw.team_a === teamName || gw.team_h === teamName)
           )
           .sort((a, b) => a.event - b.event);
-        console.log(filteredGameweeks);
         setFutureGameweeks(filteredGameweeks);
       } catch (err) {
         console.log(err.message);
